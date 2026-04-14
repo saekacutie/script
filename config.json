@@ -1,0 +1,43 @@
+{
+  "log": { "loglevel": "warning" },
+  "inbounds": [
+    {
+      "listen": "0.0.0.0",
+      "port": 8080,
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "9e507b33-65b6-40a4-b37f-eabad158b645"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "none",
+        "wsSettings": {
+          "path": "/prvtspyyy"
+        }
+      }
+    },
+    {
+      "listen": "0.0.0.0",
+      "port": 8080,
+      "protocol": "http",
+      "settings": {
+        "response": {
+          "status": 200,
+          "headers": { "Content-Type": ["text/plain"] },
+          "body": "Prvtspyyy404"
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "freedom",
+      "settings": { "domainStrategy": "UseIPv4" }
+    }
+  ]
+}
