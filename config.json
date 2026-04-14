@@ -1,11 +1,14 @@
 {
-  "log": {
-    "loglevel": "warning"
-  },
+  "log": { "loglevel": "none" },
   "dns": {
+    "hosts": {
+      "geosite:category-ads-all": "127.0.0.1",
+      "geosite:category-ads-ads": "127.0.0.1"
+    },
     "servers": [
-      "94.140.14.14",
-      "8.8.8.8"
+      "https+local://8.8.8.8/dns-query",
+      "1.1.1.1",
+      "localhost"
     ]
   },
   "inbounds": [
@@ -13,45 +16,50 @@
       "port": 8080,
       "protocol": "vless",
       "settings": {
-        "clients": [
-          {
-            "id": "9e507b33-65b6-40a4-b37f-eabad158b645"
-          }
-        ],
-        "decryption": "none"
+        "clients": [{ "id": "9e507b33-65b6-40a4-b37f-eabad158b645" }],
+        "decryption": "none",
+        "fallbacks": [{ "dest": 8081 }]
       },
       "streamSettings": {
         "network": "ws",
-        "wsSettings": {
-          "path": "/prvtspyyy"
-        }
+        "wsSettings": { "path": "/prvtspyyy" }
       },
       "sniffing": {
         "enabled": true,
-        "destOverride": ["http", "tls"]
+        "destOverride": ["http", "tls", "quic"]
+      }
+    },
+    {
+      "listen": "127.0.0.1",
+      "port": 8081,
+      "protocol": "http",
+      "settings": {
+        "response": {
+          "status": 200,
+          "headers": { 
+            "Content-Type": ["text/plain"],
+            "X-Status": "200K"
+          },
+          "body": "Prvtspyyy404 [Status: 200K] - AdBlock Active"
+        }
       }
     }
   ],
   "outbounds": [
-    {
-      "protocol": "freedom",
-      "tag": "direct"
-    },
-    {
-      "protocol": "blackhole",
-      "tag": "adblock"
-    }
+    { "protocol": "freedom", "tag": "direct" },
+    { "protocol": "blackhole", "tag": "block" }
   ],
   "routing": {
-    "domainStrategy": "IPIfNonMatch",
+    "domainStrategy": "AsIs",
     "rules": [
       {
         "type": "field",
+        "outboundTag": "block",
         "domain": [
           "geosite:category-ads-all",
-          "geosite:category-ads-ads"
-        ],
-        "outboundTag": "adblock"
+          "geosite:category-ads-ads",
+          "geosite:google-ads"
+        ]
       }
     ]
   }
