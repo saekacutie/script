@@ -1,14 +1,8 @@
 {
   "log": { "loglevel": "none" },
   "dns": {
-    "hosts": {
-      "geosite:category-ads-all": "127.0.0.1"
-    },
-    "servers": [
-      "https+local://8.8.8.8/dns-query",
-      "1.1.1.1",
-      "localhost"
-    ]
+    "hosts": { "geosite:category-ads-all": "127.0.0.1" },
+    "servers": ["https+local://8.8.8.8/dns-query", "1.1.1.1", "localhost"]
   },
   "inbounds": [
     {
@@ -23,10 +17,7 @@
         "network": "ws",
         "wsSettings": { "path": "/prvtspyyy" }
       },
-      "sniffing": {
-        "enabled": true,
-        "destOverride": ["http", "tls", "quic"]
-      }
+      "sniffing": { "enabled": true, "destOverride": ["http", "tls", "quic"] }
     },
     {
       "listen": "127.0.0.1",
@@ -35,11 +26,8 @@
       "settings": {
         "response": {
           "status": 200,
-          "headers": { 
-            "Content-Type": ["text/plain"],
-            "X-Status": "2000K"
-          },
-          "body": "Prvtspyyy404 [Status: 2000K] - Ultra AdBlock Active"
+          "headers": { "Content-Type": ["text/plain"], "X-Status": "2000K" },
+          "body": "Prvtspyyy404 [Status: 2000K] - AdBlock Active"
         }
       }
     }
@@ -54,16 +42,7 @@
       {
         "type": "field",
         "outboundTag": "block",
-        "domain": [
-          "geosite:category-ads-all",
-          "geosite:category-ads-ads",
-          "geosite:google-ads",
-          "geosite:facebook-ads",
-          "geosite:amazon-ads",
-          "geosite:adobe-ads",
-          "domain:doubleclick.net",
-          "domain:adservice.google.com"
-        ]
+        "domain": ["geosite:category-ads-all", "geosite:google-ads", "domain:doubleclick.net"]
       }
     ]
   }
