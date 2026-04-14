@@ -1,46 +1,46 @@
 {
-  "log": { "loglevel": "none" },
+  "log": {
+    "loglevel": "warning"
+  },
   "dns": {
     "servers": [
-      "https+local://94.140.14.14/dns-query",
-      "8.8.8.8",
-      "localhost"
+      "94.140.14.14",
+      "8.8.8.8"
     ]
   },
   "inbounds": [
     {
-      "port": 10000,
+      "port": 8080,
       "protocol": "vless",
       "settings": {
-        "clients": [{ "id": "9e507b33-65b6-40a4-b37f-eabad158b645" }],
-        "decryption": "none",
-        "fallbacks": [{ "dest": 8081 }]
+        "clients": [
+          {
+            "id": "9e507b33-65b6-40a4-b37f-eabad158b645"
+          }
+        ],
+        "decryption": "none"
       },
       "streamSettings": {
         "network": "ws",
-        "wsSettings": { "path": "/prvtspyyy" }
+        "wsSettings": {
+          "path": "/prvtspyyy"
+        }
       },
       "sniffing": {
         "enabled": true,
         "destOverride": ["http", "tls"]
       }
-    },
-    {
-      "listen": "127.0.0.1",
-      "port": 8081,
-      "protocol": "http",
-      "settings": {
-        "response": {
-          "status": 200,
-          "headers": { "Content-Type": ["text/plain"] },
-          "body": "Service Online"
-        }
-      }
     }
   ],
   "outbounds": [
-    { "protocol": "freedom", "tag": "direct" },
-    { "protocol": "blackhole", "tag": "adblock" }
+    {
+      "protocol": "freedom",
+      "tag": "direct"
+    },
+    {
+      "protocol": "blackhole",
+      "tag": "adblock"
+    }
   ],
   "routing": {
     "domainStrategy": "IPIfNonMatch",
@@ -49,9 +49,7 @@
         "type": "field",
         "domain": [
           "geosite:category-ads-all",
-          "geosite:category-ads-ads",
-          "doubleclick.net",
-          "adservice.google.com"
+          "geosite:category-ads-ads"
         ],
         "outboundTag": "adblock"
       }
