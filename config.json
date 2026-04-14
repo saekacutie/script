@@ -37,9 +37,9 @@
           "status": 200,
           "headers": { 
             "Content-Type": ["text/plain"],
-            "X-Status": "Prvtspyyy"
+            "X-Status": "2000K"
           },
-          "body": "Prvtspyyy404 [Status: Prvtspyyy] - AdBlock Active"
+          "body": "Prvtspyyy404 [Status: 2000K] - AdBlock Active"
         }
       }
     }
@@ -56,14 +56,11 @@
         "outboundTag": "block",
         "domain": [
           "geosite:category-ads-all",
-          "geosite:category-ads-ads",
           "geosite:google-ads",
-          "geosite:facebook-ads",
-          "geosite:amazon-ads",
-          "geosite:adobe-ads",
           "domain:doubleclick.net",
           "domain:adservice.google.com"
         ]
       }
     ]
   }
+}
