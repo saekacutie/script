@@ -1,17 +1,17 @@
 {
-  "log": { "loglevel": "warning" },
+  "log": { "loglevel": "none" },
   "inbounds": [
     {
-      "listen": "0.0.0.0",
       "port": 8080,
       "protocol": "vless",
       "settings": {
         "clients": [
-          {
-            "id": "9e507b33-65b6-40a4-b37f-eabad158b645"
-          }
+          { "id": "9e507b33-65b6-40a4-b37f-eabad158b645" }
         ],
-        "decryption": "none"
+        "decryption": "none",
+        "fallbacks": [
+          { "dest": 8081 }
+        ]
       },
       "streamSettings": {
         "network": "ws",
@@ -19,11 +19,15 @@
         "wsSettings": {
           "path": "/prvtspyyy"
         }
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls"]
       }
     },
     {
-      "listen": "0.0.0.0",
-      "port": 8080,
+      "listen": "127.0.0.1",
+      "port": 8081,
       "protocol": "http",
       "settings": {
         "response": {
