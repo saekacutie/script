@@ -2,8 +2,7 @@
   "log": { "loglevel": "none" },
   "dns": {
     "hosts": {
-      "geosite:category-ads-all": "127.0.0.1",
-      "geosite:category-ads-ads": "127.0.0.1"
+      "geosite:category-ads-all": "127.0.0.1"
     },
     "servers": [
       "https+local://8.8.8.8/dns-query",
@@ -38,9 +37,9 @@
           "status": 200,
           "headers": { 
             "Content-Type": ["text/plain"],
-            "X-Status": "200K"
+            "X-Status": "Prvtspyyy"
           },
-          "body": "Prvtspyyy404 [Status: 200K] - AdBlock Active"
+          "body": "Prvtspyyy404 [Status: Prvtspyyy] - AdBlock Active"
         }
       }
     }
@@ -50,7 +49,7 @@
     { "protocol": "blackhole", "tag": "block" }
   ],
   "routing": {
-    "domainStrategy": "AsIs",
+    "domainStrategy": "IPIfNonMatch",
     "rules": [
       {
         "type": "field",
@@ -58,7 +57,12 @@
         "domain": [
           "geosite:category-ads-all",
           "geosite:category-ads-ads",
-          "geosite:google-ads"
+          "geosite:google-ads",
+          "geosite:facebook-ads",
+          "geosite:amazon-ads",
+          "geosite:adobe-ads",
+          "domain:doubleclick.net",
+          "domain:adservice.google.com"
         ]
       }
     ]
