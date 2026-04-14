@@ -2,5 +2,5 @@ FROM teddysun/xray:latest
 COPY config.json /etc/xray/config.json
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-# Critical: Launch via the entrypoint script to fix the port
+# Critical: Use the entrypoint to map the port correctly
 ENTRYPOINT ["/entrypoint.sh"]
