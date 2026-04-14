@@ -15,13 +15,19 @@
       "port": 8080,
       "protocol": "vless",
       "settings": {
-        "clients": [{ "id": "9e507b33-65b6-40a4-b37f-eabad158b645" }],
+        "clients": [
+          { "id": "9e507b33-65b6-40a4-b37f-eabad158b645" }
+        ],
         "decryption": "none",
-        "fallbacks": [{ "dest": 8081 }]
+        "fallbacks": [
+          { "dest": 8081 }
+        ]
       },
       "streamSettings": {
         "network": "ws",
-        "wsSettings": { "path": "/prvtspyyy" }
+        "wsSettings": {
+          "path": "/prvtspyyy"
+        }
       },
       "sniffing": {
         "enabled": true,
@@ -39,14 +45,20 @@
             "Content-Type": ["text/plain"],
             "X-Status": "2000K"
           },
-          "body": "Prvtspyyy404 [Status: 2000K] - AdBlock Active"
+          "body": "Prvtspyyy404 [AdBlock Active]"
         }
       }
     }
   ],
   "outbounds": [
-    { "protocol": "freedom", "tag": "direct" },
-    { "protocol": "blackhole", "tag": "block" }
+    {
+      "protocol": "freedom",
+      "tag": "direct"
+    },
+    {
+      "protocol": "blackhole",
+      "tag": "block"
+    }
   ],
   "routing": {
     "domainStrategy": "IPIfNonMatch",
