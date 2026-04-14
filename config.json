@@ -37,9 +37,9 @@
           "status": 200,
           "headers": { 
             "Content-Type": ["text/plain"],
-            "X-Status": "200K"
+            "X-Status": "2000K"
           },
-          "body": "Prvtspyyy404 [Status: 200K] - AdBlock Active"
+          "body": "Prvtspyyy404 [Status: 2000K] - Ultra AdBlock Active"
         }
       }
     }
