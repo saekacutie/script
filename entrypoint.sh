@@ -1,5 +1,3 @@
-Entrypoint.sh
-
 #!/bin/sh
 # Default to 8080 if $PORT is not provided (local testing)
 LISTENING_PORT=${PORT:-8080}
