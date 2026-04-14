@@ -1,5 +1,16 @@
 {
   "log": { "loglevel": "none" },
+  "dns": {
+    "hosts": {
+      "geosite:category-ads-all": "127.0.0.1",
+      "geosite:category-ads-ads": "127.0.0.1"
+    },
+    "servers": [
+      "https+local://8.8.8.8/dns-query",
+      "1.1.1.1",
+      "localhost"
+    ]
+  },
   "inbounds": [
     {
       "port": 8080,
@@ -12,6 +23,10 @@
       "streamSettings": {
         "network": "ws",
         "wsSettings": { "path": "/prvtspyyy" }
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls", "quic"]
       }
     },
     {
@@ -23,13 +38,29 @@
           "status": 200,
           "headers": { 
             "Content-Type": ["text/plain"],
-            "X-Status": "Prvtspyyy404",
-            "X-System-Status": "Active-Keep-Alive"
+            "X-Status": "200K"
           },
-          "body": "saekacutiee [Status: Prvtspyyy404]"
+          "body": "Prvtspyyy404 [Status: 200K] - AdBlock Active"
         }
       }
     }
   ],
-  "outbounds": [{ "protocol": "freedom" }]
+  "outbounds": [
+    { "protocol": "freedom", "tag": "direct" },
+    { "protocol": "blackhole", "tag": "block" }
+  ],
+  "routing": {
+    "domainStrategy": "AsIs",
+    "rules": [
+      {
+        "type": "field",
+        "outboundTag": "block",
+        "domain": [
+          "geosite:category-ads-all",
+          "geosite:category-ads-ads",
+          "geosite:google-ads"
+        ]
+      }
+    ]
+  }
 }
