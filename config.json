@@ -1,18 +1,10 @@
 {
-  "log": {
-    "loglevel": "warning"
-  },
+  "log": { "loglevel": "warning" },
   "dns": {
-    "servers": [
-      "https+local://dns.google/dns-query",
-      "1.1.1.1"
-    ],
+    "servers": ["https+local://dns.google/dns-query", "1.1.1.1"],
     "hosts": {
       "domain:ads.youtube.com": "127.0.0.1",
-      "domain:s.youtube.com": "127.0.0.1",
       "domain:doubleclick.net": "127.0.0.1",
-      "domain:adservice.google.com": "127.0.0.1",
-      "domain:googleadservices.com": "127.0.0.1",
       "domain:facebook.net": "127.0.0.1",
       "domain:an.facebook.com": "127.0.0.1"
     }
@@ -35,23 +27,10 @@
           { "id": "TOKEN_AUTH-Prvtspyyy-0000-0000-288102279599", "email": "u10" }
         ],
         "decryption": "none",
-        "fallbacks": [
-          {
-            "dest": 10080
-          }
-        ]
+        "fallbacks": [{ "dest": 10080 }]
       },
-      "streamSettings": {
-        "network": "ws",
-        "wsSettings": {
-          "path": "/prvtspyyy"
-        }
-      },
-      "sniffing": {
-        "enabled": true,
-        "destOverride": ["http", "tls", "quic"],
-        "routeOnly": true
-      }
+      "streamSettings": { "network": "ws", "wsSettings": { "path": "/prvtspyyy" } },
+      "sniffing": { "enabled": true, "destOverride": ["http", "tls", "quic"], "routeOnly": true }
     },
     {
       "listen": "127.0.0.1",
@@ -60,44 +39,21 @@
       "settings": {
         "response": {
           "status": 200,
-          "headers": {
-            "Content-Type": ["text/html"]
-          },
-          "body": "<html><body>STATUS_OK</body></html>"
+          "headers": { "Content-Type": ["text/html"] },
+          "body": "<html><body>PRVTSPYYY_READY</body></html>"
         }
       }
     }
   ],
   "outbounds": [
-    {
-      "protocol": "freedom",
-      "tag": "direct"
-    },
-    {
-      "protocol": "blackhole",
-      "tag": "block"
-    }
+    { "protocol": "freedom", "tag": "direct" },
+    { "protocol": "blackhole", "tag": "block" }
   ],
   "routing": {
     "domainStrategy": "AsIs",
     "rules": [
-      {
-        "type": "field",
-        "outboundTag": "block",
-        "domain": [
-          "domain:ads.youtube.com",
-          "domain:s.youtube.com",
-          "domain:doubleclick.net",
-          "domain:adservice.google.com",
-          "domain:facebook.net",
-          "domain:an.facebook.com"
-        ]
-      },
-      {
-        "type": "field",
-        "outboundTag": "direct",
-        "network": "udp,tcp"
-      }
+      { "type": "field", "outboundTag": "block", "domain": ["domain:ads.youtube.com", "domain:facebook.net"] },
+      { "type": "field", "outboundTag": "direct", "network": "udp,tcp" }
     ]
   }
 }
