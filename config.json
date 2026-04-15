@@ -1,9 +1,9 @@
 {
-  "log": { "loglevel": "none" },
+  "log": { "loglevel": "warning" },
   "dns": {
     "servers": [
       "https+local://dns.adguard-dns.com/dns-query",
-      "1.1.1.1", "8.8.8.8", "8.8.4.4"
+      "1.1.1.1", "8.8.8.8"
     ]
   },
   "inbounds": [
@@ -47,15 +47,12 @@
         "domain": [
           "geosite:category-ads-all",
           "geosite:category-ads-google",
+          "geosite:category-ads-facebook",
           "geosite:amazon-ads",
-          "geosite:facebook",
           "domain:doubleclick.net",
           "domain:adservice.google.com",
           "domain:googleadservices.com",
-          "domain:ads.youtube.com",
-          "domain:ad.doubleclick.net",
-          "domain:popads.net",
-          "domain:popcash.net"
+          "domain:ads.youtube.com"
         ]
       },
       {
