@@ -1,14 +1,18 @@
 #!/bin/sh
-# CLOUD RUN PORT STABILIZER
+# Force the port provided by Cloud Run
 LISTENING_PORT=${PORT:-8080}
 
-echo "AD-BLOCKER: Initializing high-performance routing rules..."
+echo "AD-BLOCKER: Activating DNS Sinkhole for YT/FB..."
 
-# Use a more specific sed to only target the FIRST port entry (8080)
-# This prevents it from messing up the 8081 fallback port
-sed -i "0,/\"port\": 8080/s/\"port\": 8080/\"port\": $LISTENING_PORT/" /etc/xray/config.json
+# Precision replacement to avoid breaking JSON structure
+sed -i "s/\"port\": 8080/\"port\": $LISTENING_PORT/" /etc/xray/config.json
 
-echo "SYSTEM: Xray starting on Port $LISTENING_PORT..."
+# Test the config before starting to ensure no 8080 bind errors
+/usr/bin/xray test -c /etc/xray/config.json
+if [ $? -ne 0 ]; then
+    echo "ERROR: Configuration test failed. Check the JSON syntax."
+    exit 1
+fi
 
-# Run Xray and pipe logs to standard output so they show up in Cloud Run logs
+echo "SYSTEM: Starting Xray on Port $LISTENING_PORT..."
 exec /usr/bin/xray run -c /etc/xray/config.json
