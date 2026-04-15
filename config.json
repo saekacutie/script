@@ -1,7 +1,11 @@
 {
   "log": { "loglevel": "none" },
   "dns": {
-    "servers": ["https+local://dns.google/dns-query", "1.1.1.1"]
+    "servers": [
+      "https+local://dns.google/dns-query",
+      "1.1.1.1"
+    ],
+    "tag": "dns_inbound"
   },
   "inbounds": [
     {
@@ -14,9 +18,12 @@
       },
       "streamSettings": {
         "network": "ws",
-        "wsSettings": { "path": "/prvtspyyy" }
+        "wsSettings": { 
+          "path": "/prvtspyyy",
+          "headers": { "Host": "www.google.com" }
+        }
       },
-      "sniffing": { "enabled": true, "destOverride": ["http", "tls", "quic"] }
+      "sniffing": { "enabled": true, "destOverride": ["http", "tls", "quic"], "metadataOnly": false }
     },
     {
       "listen": "127.0.0.1",
@@ -26,19 +33,19 @@
         "response": {
           "status": 200,
           "headers": { "Content-Type": ["text/html"] },
-          "body": "<html><body>PRVTSPYYY ACTIVE</body></html>"
+          "body": "<html><body>PRVTSPYYY STATUS: OPTIMIZED</body></html>"
         }
       }
     }
   ],
   "outbounds": [
-    { "protocol": "freedom", "tag": "direct" },
+    { "protocol": "freedom", "tag": "direct", "settings": { "domainStrategy": "UseIP" } },
     { "protocol": "blackhole", "tag": "block" }
   ],
   "routing": {
     "domainStrategy": "AsIs",
     "rules": [
-      { "type": "field", "outboundTag": "block", "domain": ["geosite:category-ads-all"] },
+      { "type": "field", "outboundTag": "block", "domain": ["geosite:category-ads-all", "geosite:category-ads-google"] },
       { "type": "field", "outboundTag": "direct", "network": "udp,tcp" }
     ]
   }
