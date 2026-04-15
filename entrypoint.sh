@@ -1,14 +1,11 @@
 #!/bin/sh
-
-# Default to 8080 if Cloud Run doesn't provide a PORT
+# Use the port Cloud Run gives us, or default to 8080
 LISTENING_PORT=${PORT:-8080}
 
-# STABILIZER: Specifically target only the 8080 port in the config
-# This prevents it from accidentally touching the 8081 fallback port.
-sed -i "s/\"port\": 8080/\"port\": $LISTENING_PORT/g" /etc/xray/config.json
+# Replace ONLY the first instance of "port": 8080 to avoid touching port 8081
+sed -i "0,/\"port\": 8080/s/\"port\": 8080/\"port\": $LISTENING_PORT/" /etc/xray/config.json
 
-echo "SYSTEM: Xray binding to Port $LISTENING_PORT..."
-echo "SYSTEM: Initializing high-speed routing..."
+echo "AD-BLOCKER: Initializing DNS Sinkhole..."
+echo "SYSTEM: Starting Xray on Port $LISTENING_PORT..."
 
-# Start Xray
 exec /usr/bin/xray run -c /etc/xray/config.json
