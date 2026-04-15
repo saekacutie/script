@@ -1,16 +1,17 @@
 #!/bin/sh
-# CLOUD RUN STABILIZER
+# PORT STABILIZER
 LISTENING_PORT=${PORT:-8080}
 
-echo "AD-BLOCKER: Sinking YT/FB ad domains..."
+echo "SYSTEM: Initializing YouTube/Facebook Ad-Block..."
 
-# Only replace the port on the line that defines the main inbound
-sed -i "0,/\"port\": 8080/s/\"port\": 8080/\"port\": $LISTENING_PORT/" /etc/xray/config.json
+# Use a unique placeholder '9999' to avoid accidental multi-replaces
+sed -i "s/\"port\": 9999/\"port\": $LISTENING_PORT/" /etc/xray/config.json
 
-# CRITICAL: Verify the config is valid before starting
+# CRITICAL: Validate JSON syntax before running
+echo "SYSTEM: Validating configuration..."
 /usr/bin/xray test -c /etc/xray/config.json
 if [ $? -ne 0 ]; then
-    echo "FATAL: Config Error. Check JSON syntax."
+    echo "ERROR: JSON Syntax is invalid. Deployment halted."
     exit 1
 fi
 
