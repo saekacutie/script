@@ -8,11 +8,10 @@
       "1.1.1.1"
     ],
     "hosts": {
-      "geosite:category-ads-all": "127.0.0.1",
       "domain:ads.youtube.com": "127.0.0.1",
-      "domain:s.youtube.com": "127.0.0.1",
       "domain:doubleclick.net": "127.0.0.1",
       "domain:adservice.google.com": "127.0.0.1",
+      "domain:googleadservices.com": "127.0.0.1",
       "domain:facebook.net": "127.0.0.1",
       "domain:an.facebook.com": "127.0.0.1"
     }
@@ -35,7 +34,7 @@
           { "id": "TOKEN_AUTH-Prvtspyyy-0000-0000-288102279599", "email": "user10" }
         ],
         "decryption": "none",
-        "fallbacks": [{ "dest": 8081 }]
+        "fallbacks": [{"dest": 8081}]
       },
       "streamSettings": {
         "network": "ws",
@@ -44,7 +43,7 @@
       "sniffing": {
         "enabled": true,
         "destOverride": ["http", "tls", "quic"],
-        "metadataOnly": false
+        "routeOnly": true
       }
     },
     {
@@ -55,7 +54,7 @@
         "response": {
           "status": 200,
           "headers": { "Content-Type": ["text/html"] },
-          "body": "<html><body>SYSTEM ONLINE: Performance Mode</body></html>"
+          "body": "<html><body>SYSTEM: Prvtspyyy Online</body></html>"
         }
       }
     }
@@ -65,32 +64,21 @@
     { "protocol": "blackhole", "tag": "block" }
   ],
   "routing": {
-    "domainStrategy": "IPOnDemand",
+    "domainStrategy": "IPIfNonMatch",
     "rules": [
       {
         "type": "field",
         "outboundTag": "block",
         "domain": [
           "geosite:category-ads-all",
-          "geosite:google-ads",
           "domain:ads.youtube.com",
-          "domain:s.youtube.com",
-          "domain:youtube-ui.l.google.com",
+          "domain:doubleclick.net",
+          "domain:adservice.google.com",
           "domain:facebook.net",
-          "domain:an.facebook.com",
-          "domain:pixel.facebook.com"
+          "domain:an.facebook.com"
         ]
       },
-      {
-        "type": "field",
-        "outboundTag": "block",
-        "ip": ["geoip:private"]
-      },
-      {
-        "type": "field",
-        "outboundTag": "direct",
-        "network": "udp,tcp"
-      }
+      { "type": "field", "outboundTag": "direct", "network": "udp,tcp" }
     ]
   }
 }
