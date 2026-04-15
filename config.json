@@ -15,7 +15,9 @@
       },
       "streamSettings": {
         "network": "ws",
-        "wsSettings": { "path": "/prvtspyyy" }
+        "wsSettings": { 
+          "path": "/prvtspyyy"
+        }
       },
       "sniffing": { "enabled": true, "destOverride": ["http", "tls", "quic"] }
     },
@@ -27,7 +29,7 @@
         "response": {
           "status": 200,
           "headers": { "Content-Type": ["text/plain"] },
-          "body": "System Online"
+          "body": "Keep-Alive Active"
         }
       }
     }
@@ -42,12 +44,7 @@
       {
         "type": "field",
         "outboundTag": "block",
-        "domain": [
-          "geosite:category-ads-all",
-          "geosite:google-ads",
-          "domain:doubleclick.net",
-          "domain:adservice.google.com"
-        ]
+        "domain": ["geosite:category-ads-all"]
       }
     ]
   }
