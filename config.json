@@ -5,13 +5,24 @@
       "port": 8080,
       "protocol": "vless",
       "settings": {
-        "clients": [{ "id": "9e507b33-65b6-40a4-b37f-eabad158b645" }],
+        "clients": [
+          { "id": "9e507b33-65b6-40a4-b37f-eabad158b645" }
+        ],
         "decryption": "none",
-        "fallbacks": [{ "dest": 8081 }]
+        "fallbacks": [
+          { "dest": 8081 }
+        ]
       },
       "streamSettings": {
         "network": "ws",
-        "wsSettings": { "path": "/prvtspyyy" }
+        "security": "none",
+        "wsSettings": {
+          "path": "/prvtspyyy"
+        }
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls"]
       }
     },
     {
@@ -21,15 +32,16 @@
       "settings": {
         "response": {
           "status": 200,
-          "headers": { 
-            "Content-Type": ["text/plain"],
-            "X-Status": "Prvtspyyy404",
-            "X-System-Status": "Active-Keep-Alive"
-          },
-          "body": "saekacutiee [Status: Prvtspyyy404]"
+          "headers": { "Content-Type": ["text/plain"] },
+          "body": "Prvtspyyy404"
         }
       }
     }
   ],
-  "outbounds": [{ "protocol": "freedom" }]
+  "outbounds": [
+    {
+      "protocol": "freedom",
+      "settings": { "domainStrategy": "UseIPv4" }
+    }
+  ]
 }
