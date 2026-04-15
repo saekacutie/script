@@ -165,54 +165,58 @@ echo -e "${C_HEADER}════════════════════
 echo ""
 
 # ==============================================
-#        QUOTA-SAFE LOCAL BUILD & DEPLOY (NO TIMEOUT)
+#        QUOTA-SAFE LOCAL BUILD & DEPLOY
 # ==============================================
 echo -e "${C_HEADER}════════════════════════════════════════════════════════════════════════════${RESET}"
-echo -e "${C_PLAIN}$(math_bold "BUILDING AND DEPLOYING (QUOTA-FREE)")${RESET}"
+echo -e "${C_PLAIN}$(math_bold "BUILDING AND DEPLOYING (SCALABLE)")${RESET}"
 echo -e "${C_HEADER}════════════════════════════════════════════════════════════════════════════${RESET}"
 
 IMAGE="gcr.io/$PROJECT_ID/$SERVICE_NAME:latest"
 
-# 1. Build the image locally to bypass Cloud Build quotas
-echo -e "${C_INFO}[*]${RESET} Building container image locally..."
-docker build -t "$IMAGE" . --quiet
-echo -e "${C_SUCCESS}[✔]${RESET} Local build complete"
+# Dynamically pull UUID and WS_PATH from config.json to prevent blank URI fields
+UUID=$(grep -o '"id": *"[^"]*"' config.json | cut -d'"' -f4 | head -n 1)
+WS_PATH=$(grep -o '"path": *"[^"]*"' config.json | cut -d'"' -f4 | head -n 1)
 
-# 2. Push the image to Google Container Registry
-echo -e "${C_INFO}[*]${RESET} Pushing image to Container Registry..."
-docker push "$IMAGE" --quiet
-echo -e "${C_SUCCESS}[✔]${RESET} Push complete"
+# 1. Build locally
+echo -ne "${C_INFO}[*]${RESET} Building container image locally...\r"
+docker build -t "$IMAGE" . --quiet > /dev/null 2>&1
+echo -e "${C_SUCCESS}[✔]${RESET} Building container image locally... SUCCESSFUL! \033[K"
 
-# --- Deploy to Cloud Run (Corrected Port) ---
-echo -e "${C_INFO}[*]${RESET} Deploying to Cloud Run in ${REGION}..."
+# 2. Push image
+echo -ne "${C_INFO}[*]${RESET} Pushing image to Container Registry...\r"
+docker push "$IMAGE" --quiet > /dev/null 2>&1
+echo -e "${C_SUCCESS}[✔]${RESET} Pushing image to Container Registry... SUCCESSFUL! \033[K"
+
+# 3. Deploy to Cloud Run (Scaled for Countless Users)
+echo -ne "${C_INFO}[*]${RESET} Deploying to Cloud Run in ${REGION} (Auto-Scaling Enabled)...\r"
 gcloud run deploy "$SERVICE_NAME" \
     --image "$IMAGE" \
     --platform managed \
-    --region us-central1 \
+    --region "$REGION" \
     --allow-unauthenticated \
     --port 8080 \
-    --cpu 2 \
-    --memory 4Gi \
+    --cpu "$CPU" \
+    --memory "$MEMORY" \
     --cpu-boost \
     --concurrency 1000 \
     --timeout 3600 \
     --min-instances 1 \
-    --max-instances 1 \
+    --max-instances 100 \
     --no-cpu-throttling \
     --session-affinity \
-    --quiet
+    --quiet > /dev/null 2>&1
 
 if [ $? -eq 0 ]; then
+    echo -e "${C_SUCCESS}[✔]${RESET} Deploying to Cloud Run... SUCCESSFUL! \033[K"
     SERVICE_URL=$(gcloud run services describe "$SERVICE_NAME" --region "$REGION" --format='value(status.url)' 2>/dev/null)
     CLEAN_HOST=$(echo "$SERVICE_URL" | sed 's|https://||')
-    echo -e "${C_SUCCESS}[✔]${RESET} Deployment complete"
 else
-    echo -e "${C_ERROR}[✘]${RESET} Deployment failed. Check the error message above."
+    echo -e "${C_ERROR}[✘]${RESET} Deployment failed. \033[K"
     exit 1
 fi
 
-# --- Generate VLESS URI with Gstatic Address ---
-VLESS_URI="vless://${UUID}@www.gstatic.com:443?encryption=none&security=tls&type=ws&path=%2F${WS_PATH#/}&host=${CLEAN_HOST}&sni=firebase-settings.crashlytics.com&fp=chrome#${SERVICE_NAME}" 
+# --- Generate VLESS URI ---
+VLESS_URI="vless://${UUID}@www.gstatic.com:443?encryption=none&security=tls&type=ws&path=%2F${WS_PATH#/}&host=${CLEAN_HOST}&sni=firebase-settings.crashlytics.com&fp=chrome#${SERVICE_NAME}"
 echo ""
 echo -e "${C_SUCCESS}╔════════════════════════════════════════════════════════════════════════════╗${RESET}"
 echo -e "${C_SUCCESS}║${RESET}                                                                            ${C_SUCCESS}║${RESET}"
