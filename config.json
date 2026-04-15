@@ -1,7 +1,7 @@
 {
   "log": { "loglevel": "none" },
   "dns": {
-    "hosts": { "geosite:category-ads-all",: "127.0.0.1" },
+    "hosts": { "geosite:category-ads-all": "127.0.0.1" },
     "servers": ["1.1.1.1", "8.8.8.8", "localhost"]
   },
   "inbounds": [
