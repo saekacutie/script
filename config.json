@@ -1,7 +1,10 @@
 {
   "log": { "loglevel": "none" },
   "dns": {
-    "hosts": { "geosite:category-ads-all": "127.0.0.1" },
+    "hosts": {
+      "geosite:category-ads-all": "127.0.0.1",
+      "geosite:category-ads-google": "127.0.0.1"
+    },
     "servers": ["1.1.1.1", "8.8.8.8", "localhost"]
   },
   "inbounds": [
@@ -44,7 +47,16 @@
       {
         "type": "field",
         "outboundTag": "block",
-        "domain": ["geosite:category-ads-all"]
+        "domain": [
+          "geosite:category-ads-all",
+          "geosite:category-ads-google",
+          "domain:googlevideo.com",
+          "domain:youtube-ui.l.google.com",
+          "domain:ytimg.l.google.com",
+          "domain:doubleclick.net",
+          "domain:adservice.google.com",
+          "domain:googleadservices.com"
+        ]
       }
     ]
   }
