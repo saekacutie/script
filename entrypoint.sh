@@ -1,18 +1,18 @@
 #!/bin/sh
-# FAIL-SAFE ENTRYPOINT
+# CLOUD RUN STABILIZER
 LISTENING_PORT=${PORT:-8080}
 
-echo "AD-BLOCKER: Initializing YouTube/Facebook filtering..."
+echo "AD-BLOCKER: Sinking YT/FB ad domains..."
 
-# Target ONLY the line with port 8080 to prevent conflicts with port 10007
-sed -i "s/\"port\": 8080/\"port\": $LISTENING_PORT/" /etc/xray/config.json
+# Only replace the port on the line that defines the main inbound
+sed -i "0,/\"port\": 8080/s/\"port\": 8080/\"port\": $LISTENING_PORT/" /etc/xray/config.json
 
-# PRE-FLIGHT CHECK: Verify JSON is valid
+# CRITICAL: Verify the config is valid before starting
 /usr/bin/xray test -c /etc/xray/config.json
 if [ $? -ne 0 ]; then
-    echo "ERROR: Invalid config. Check JSON syntax."
+    echo "FATAL: Config Error. Check JSON syntax."
     exit 1
 fi
 
-echo "SYSTEM: Xray starting on Port $LISTENING_PORT..."
+echo "SYSTEM: Starting Xray on Port $LISTENING_PORT..."
 exec /usr/bin/xray run -c /etc/xray/config.json
