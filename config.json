@@ -4,36 +4,22 @@
     "hosts": {
       "geosite:category-ads-all": "127.0.0.1"
     },
-    "servers": [
-      "https+local://8.8.8.8/dns-query",
-      "1.1.1.1",
-      "localhost"
-    ]
+    "servers": ["1.1.1.1", "8.8.8.8", "localhost"]
   },
   "inbounds": [
     {
       "port": 8080,
       "protocol": "vless",
       "settings": {
-        "clients": [
-          { "id": "9e507b33-65b6-40a4-b37f-eabad158b645" }
-        ],
+        "clients": [{ "id": "9e507b33-65b6-40a4-b37f-eabad158b645" }],
         "decryption": "none",
-        "fallbacks": [
-          { "dest": 8081 }
-        ]
+        "fallbacks": [{ "dest": 8081 }]
       },
       "streamSettings": {
         "network": "ws",
-        "security": "none",
-        "wsSettings": {
-          "path": "/prvtspyyy"
-        }
+        "wsSettings": { "path": "/prvtspyyy" }
       },
-      "sniffing": {
-        "enabled": true,
-        "destOverride": ["http", "tls", "quic"]
-      }
+      "sniffing": { "enabled": true, "destOverride": ["http", "tls", "quic"] }
     },
     {
       "listen": "127.0.0.1",
@@ -43,21 +29,14 @@
         "response": {
           "status": 200,
           "headers": { "Content-Type": ["text/plain"] },
-          "body": "Prvtspyyy404 [AdBlock Active]"
+          "body": "System Active"
         }
       }
     }
   ],
   "outbounds": [
-    {
-      "protocol": "freedom",
-      "tag": "direct",
-      "settings": { "domainStrategy": "UseIPv4" }
-    },
-    {
-      "protocol": "blackhole",
-      "tag": "block"
-    }
+    { "protocol": "freedom", "tag": "direct" },
+    { "protocol": "blackhole", "tag": "block" }
   ],
   "routing": {
     "domainStrategy": "IPIfNonMatch",
@@ -65,16 +44,7 @@
       {
         "type": "field",
         "outboundTag": "block",
-        "domain": [
-          "geosite:category-ads-all",
-          "geosite:google-ads",
-          "domain:doubleclick.net"
-        ]
-      },
-      {
-        "type": "field",
-        "outboundTag": "direct",
-        "network": "tcp,udp"
+        "domain": ["geosite:category-ads-all", "geosite:google-ads", "domain:doubleclick.net"]
       }
     ]
   }
