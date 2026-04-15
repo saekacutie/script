@@ -1,28 +1,33 @@
 {
-  "log": { "loglevel": "none" },
+  "log": { "loglevel": "warning" },
   "dns": {
-    "hosts": {
-      "geosite:category-ads-all": "127.0.0.1",
-      "geosite:category-ads-ads": "127.0.0.1"
-    },
     "servers": [
-      "https+local://8.8.8.8/dns-query",
-      "1.1.1.1",
+      {
+        "address": "https://dns.adguard-dns.com/dns-query",
+        "domains": ["geosite:category-ads-all"]
+      },
+      {
+        "address": "https://dns.cloudflare.com/dns-query",
+        "domains": ["geosite:geolocation-!cn"]
+      },
       "localhost"
     ]
   },
   "inbounds": [
     {
+      "listen": "0.0.0.0",
       "port": 8080,
       "protocol": "vless",
       "settings": {
         "clients": [{ "id": "9e507b33-65b6-40a4-b37f-eabad158b645" }],
         "decryption": "none",
-        "fallbacks": [{ "dest": 8081 }]
+        "fallbacks": [{ "dest": 8081, "xver": 0 }]
       },
       "streamSettings": {
-        "network": "ws",
-        "wsSettings": { "path": "/prvtspyyy" }
+        "network": "tcp",
+        "security": "none",
+        "tcpSettings": { "header": { "type": "none" } },
+        "sockopt": { "tcpFastOpen": true }
       },
       "sniffing": {
         "enabled": true,
@@ -32,15 +37,25 @@
     {
       "listen": "127.0.0.1",
       "port": 8081,
-      "protocol": "http",
-      "settings": {
-        "response": {
-          "status": 200,
-          "headers": { 
-            "Content-Type": ["text/plain"],
-            "X-Status": "200K"
-          },
-          "body": "Prvtspyyy404 [Status: 200K] - AdBlock Active"
+      "protocol": "freedom",
+      "settings": {},
+      "streamSettings": {
+        "network": "tcp",
+        "security": "none",
+        "tcpSettings": {
+          "header": {
+            "type": "http",
+            "response": {
+              "version": "1.1",
+              "status": "200",
+              "reason": "OK",
+              "headers": {
+                "Content-Type": ["text/plain"],
+                "X-Status": ["200K"]
+              },
+              "body": "Prvtspyyy404 [Status: 200K] - AdBlock Active"
+            }
+          }
         }
       }
     }
@@ -50,17 +65,37 @@
     { "protocol": "blackhole", "tag": "block" }
   ],
   "routing": {
-    "domainStrategy": "AsIs",
+    "domainStrategy": "IPIfNonMatch",
     "rules": [
       {
         "type": "field",
         "outboundTag": "block",
         "domain": [
           "geosite:category-ads-all",
-          "geosite:category-ads-ads",
-          "geosite:google-ads"
+          "geosite:google-ads",
+          "geosite:adobe-ads",
+          "geosite:amazon-ads",
+          "geosite:apple-ads",
+          "geosite:bytedance-ads",
+          "geosite:facebook-ads",
+          "geosite:microsoft-ads",
+          "geosite:spotify-ads",
+          "geosite:twitch-ads"
         ]
+      },
+      {
+        "type": "field",
+        "outboundTag": "direct",
+        "network": "tcp,udp"
       }
     ]
+  },
+  "transport": {
+    "maxBufferSize": 10485760,
+    "maxStreamBufferSize": 5242880
+  },
+  "mux": {
+    "enabled": true,
+    "concurrency": 16
   }
-}
+  }
