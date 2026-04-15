@@ -1,22 +1,14 @@
 {
-  "log": {
-    "loglevel": "warning"
-  },
+  "log": { "loglevel": "warning" },
   "dns": {
-    "servers": [
-      "https+local://dns.google/dns-query",
-      "1.1.1.1"
-    ],
+    "servers": ["https+local://dns.google/dns-query", "1.1.1.1"],
     "hosts": {
       "domain:ads.youtube.com": "127.0.0.1",
       "domain:s.youtube.com": "127.0.0.1",
       "domain:doubleclick.net": "127.0.0.1",
       "domain:adservice.google.com": "127.0.0.1",
-      "domain:googleadservices.com": "127.0.0.1",
-      "domain:googlesyndication.com": "127.0.0.1",
       "domain:facebook.net": "127.0.0.1",
-      "domain:an.facebook.com": "127.0.0.1",
-      "domain:pixel.facebook.com": "127.0.0.1"
+      "domain:an.facebook.com": "127.0.0.1"
     }
   },
   "inbounds": [
@@ -25,39 +17,35 @@
       "protocol": "vless",
       "settings": {
         "clients": [
-          { "id": "TOKEN_AUTH-Prvtspyyy-1111-1111-937373339593", "email": "user1" },
-          { "id": "TOKEN_AUTH-Prvtspyyy-2222-2222-033361000748", "email": "user2" },
-          { "id": "TOKEN_AUTH-Prvtspyyy-3333-3333-111529994838", "email": "user3" },
-          { "id": "TOKEN_AUTH-Prvtspyyy-4444-4444-444738212858", "email": "user4" },
-          { "id": "TOKEN_AUTH-Prvtspyyy-5555-5555-000765844383", "email": "user5" },
-          { "id": "TOKEN_AUTH-Prvtspyyy-6666-6666-663932888496", "email": "user6" },
-          { "id": "TOKEN_AUTH-Prvtspyyy-7777-7777-000784447379", "email": "user7" },
-          { "id": "TOKEN_AUTH-Prvtspyyy-8888-8888-008382226484", "email": "user8" },
-          { "id": "TOKEN_AUTH-Prvtspyyy-9999-9999-888483317896", "email": "user9" },
-          { "id": "TOKEN_AUTH-Prvtspyyy-0000-0000-288102279599", "email": "user10" }
+          { "id": "TOKEN_AUTH-Prvtspyyy-1111-1111-937373339593", "email": "u1" },
+          { "id": "TOKEN_AUTH-Prvtspyyy-2222-2222-033361000748", "email": "u2" },
+          { "id": "TOKEN_AUTH-Prvtspyyy-3333-3333-111529994838", "email": "u3" },
+          { "id": "TOKEN_AUTH-Prvtspyyy-4444-4444-444738212858", "email": "u4" },
+          { "id": "TOKEN_AUTH-Prvtspyyy-5555-5555-000765844383", "email": "u5" },
+          { "id": "TOKEN_AUTH-Prvtspyyy-6666-6666-663932888496", "email": "u6" },
+          { "id": "TOKEN_AUTH-Prvtspyyy-7777-7777-000784447379", "email": "u7" },
+          { "id": "TOKEN_AUTH-Prvtspyyy-8888-8888-008382226484", "email": "u8" },
+          { "id": "TOKEN_AUTH-Prvtspyyy-9999-9999-888483317896", "email": "u9" },
+          { "id": "TOKEN_AUTH-Prvtspyyy-0000-0000-288102279599", "email": "u10" }
         ],
         "decryption": "none",
-        "fallbacks": [{"dest": 8081}]
+        "fallbacks": [{ "dest": 10007 }]
       },
       "streamSettings": {
         "network": "ws",
         "wsSettings": { "path": "/prvtspyyy" }
       },
-      "sniffing": {
-        "enabled": true,
-        "destOverride": ["http", "tls", "quic"],
-        "routeOnly": true
-      }
+      "sniffing": { "enabled": true, "destOverride": ["http", "tls", "quic"], "routeOnly": true }
     },
     {
       "listen": "127.0.0.1",
-      "port": 8081,
+      "port": 10007,
       "protocol": "http",
       "settings": {
         "response": {
           "status": 200,
           "headers": { "Content-Type": ["text/html"] },
-          "body": "<html><body>SYSTEM: Prvtspyyy Online</body></html>"
+          "body": "<html><body>STATUS_OK</body></html>"
         }
       }
     }
@@ -77,9 +65,9 @@
           "domain:s.youtube.com",
           "domain:doubleclick.net",
           "domain:adservice.google.com",
-          "domain:googleadservices.com",
           "domain:facebook.net",
-          "domain:an.facebook.com"
+          "domain:an.facebook.com",
+          "domain:pixel.facebook.com"
         ]
       },
       { "type": "field", "outboundTag": "direct", "network": "udp,tcp" }
