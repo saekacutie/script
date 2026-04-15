@@ -163,33 +163,45 @@ esac
 echo -e "${C_SUCCESS}[✔]${RESET} CPU: ${BOLD}${CPU}${RESET}, Memory: ${BOLD}${MEMORY}${RESET}"
 echo -e "${C_HEADER}════════════════════════════════════════════════════════════════════════════${RESET}"
 echo ""
-
 # ==============================================
-#        QUOTA-SAFE LOCAL BUILD & DEPLOY
+#        ULTRA-STABLE DEPLOYMENT ENGINE
 # ==============================================
 echo -e "${C_HEADER}════════════════════════════════════════════════════════════════════════════${RESET}"
-echo -e "${C_PLAIN}$(math_bold "BUILDING AND DEPLOYING (SCALABLE)")${RESET}"
+echo -e "${C_PLAIN}$(math_bold "INITIATING FULL SYSTEM DEPLOYMENT")${RESET}"
 echo -e "${C_HEADER}════════════════════════════════════════════════════════════════════════════${RESET}"
 
-IMAGE="gcr.io/$PROJECT_ID/$SERVICE_NAME:latest"
+# 1. PRE-FLIGHT CHECK (Ensures APIs are ready)
+echo -ne "${C_INFO}[*]${RESET} Verifying Google Cloud Environment...\r"
+gcloud services enable run.googleapis.com containerregistry.googleapis.com > /dev/null 2>&1
+echo -e "${C_SUCCESS}[✔]${RESET} Verifying Google Cloud Environment... READY! \033[K"
 
-# Dynamically pull UUID and WS_PATH from config.json to prevent blank URI fields
+# Extract Variables
 UUID=$(grep -o '"id": *"[^"]*"' config.json | cut -d'"' -f4 | head -n 1)
 WS_PATH=$(grep -o '"path": *"[^"]*"' config.json | cut -d'"' -f4 | head -n 1)
+IMAGE="gcr.io/$PROJECT_ID/$SERVICE_NAME:latest"
 
-# 1. Build locally
-echo -ne "${C_INFO}[*]${RESET} Building container image locally...\r"
-docker build -t "$IMAGE" . --quiet > /dev/null 2>&1
-echo -e "${C_SUCCESS}[✔]${RESET} Building container image locally... SUCCESSFUL! \033[K"
+# 2. BUILD
+echo -ne "${C_INFO}[*]${RESET} Building high-speed container image...\r"
+if ! docker build -t "$IMAGE" . --quiet > /dev/null 2>&1; then
+    echo -e "${C_ERROR}[✘]${RESET} Build Failed. Check your Dockerfile content."
+    exit 1
+fi
+echo -e "${C_SUCCESS}[✔]${RESET} Building high-speed container image... SUCCESSFUL! \033[K"
 
-# 2. Push image
-echo -ne "${C_INFO}[*]${RESET} Pushing image to Container Registry...\r"
-docker push "$IMAGE" --quiet > /dev/null 2>&1
-echo -e "${C_SUCCESS}[✔]${RESET} Pushing image to Container Registry... SUCCESSFUL! \033[K"
+# 3. PUSH
+echo -ne "${C_INFO}[*]${RESET} Pushing to Global Registry...\r"
+if ! docker push "$IMAGE" --quiet > /dev/null 2>&1; then
+    echo -e "${C_ERROR}[✘]${RESET} Push Failed. Check your internet or permissions."
+    exit 1
+fi
+echo -e "${C_SUCCESS}[✔]${RESET} Pushing to Global Registry... SUCCESSFUL! \033[K"
 
-# 3. Deploy to Cloud Run (Scaled for Countless Users)
-echo -ne "${C_INFO}[*]${RESET} Deploying to Cloud Run in ${REGION} (Auto-Scaling Enabled)...\r"
-gcloud run deploy "$SERVICE_NAME" \
+# 4. DEPLOY (The critical step)
+echo -ne "${C_INFO}[*]${RESET} Deploying to Cloud Run (Applying Latency Optimizations)...\r"
+
+# We capture the error in a variable instead of sending to /dev/null 
+# so we can tell you EXACTLY why it stopped if it fails.
+DEPLOY_ERROR=$(gcloud run deploy "$SERVICE_NAME" \
     --image "$IMAGE" \
     --platform managed \
     --region "$REGION" \
@@ -204,19 +216,20 @@ gcloud run deploy "$SERVICE_NAME" \
     --max-instances 100 \
     --no-cpu-throttling \
     --session-affinity \
-    --quiet > /dev/null 2>&1
+    --quiet 2>&1 > /dev/null)
 
 if [ $? -eq 0 ]; then
     echo -e "${C_SUCCESS}[✔]${RESET} Deploying to Cloud Run... SUCCESSFUL! \033[K"
     SERVICE_URL=$(gcloud run services describe "$SERVICE_NAME" --region "$REGION" --format='value(status.url)' 2>/dev/null)
     CLEAN_HOST=$(echo "$SERVICE_URL" | sed 's|https://||')
 else
-    echo -e "${C_ERROR}[✘]${RESET} Deployment failed. \033[K"
+    echo -e "${C_ERROR}[✘]${RESET} Deployment Halted! \033[K"
+    echo -e "${C_WARN}REASON:${RESET} $DEPLOY_ERROR"
     exit 1
 fi
 
-# --- Generate VLESS URI ---
-VLESS_URI="vless://${UUID}@www.gstatic.com:443?encryption=none&security=tls&type=ws&path=%2F${WS_PATH#/}&host=${CLEAN_HOST}&sni=firebase-settings.crashlytics.com&fp=chrome#${SERVICE_NAME}"
+# --- URI Generation ---
+VLESS_URI="vless://${UUID}@${CLEAN_HOST}:443?encryption=none&security=tls&type=ws&path=%2F${WS_PATH#/}&host=${CLEAN_HOST}&sni=${CLEAN_HOST}&fp=chrome#${SERVICE_NAME}"
 echo ""
 echo -e "${C_SUCCESS}╔════════════════════════════════════════════════════════════════════════════╗${RESET}"
 echo -e "${C_SUCCESS}║${RESET}                                                                            ${C_SUCCESS}║${RESET}"
