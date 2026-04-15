@@ -1,6 +1,7 @@
 {
   "log": { "loglevel": "none" },
   "dns": {
+    "hosts": { "geosite:category-ads-all",: "127.0.0.1" },
     "servers": ["1.1.1.1", "8.8.8.8", "localhost"]
   },
   "inbounds": [
@@ -14,7 +15,9 @@
       },
       "streamSettings": {
         "network": "ws",
-        "wsSettings": { "path": "/prvtspyyy" }
+        "wsSettings": { 
+          "path": "/prvtspyyy"
+        }
       },
       "sniffing": { "enabled": true, "destOverride": ["http", "tls", "quic"] }
     },
@@ -26,7 +29,7 @@
         "response": {
           "status": 200,
           "headers": { "Content-Type": ["text/plain"] },
-          "body": "PRVTSPYYY404: ADGUARD CORE ACTIVE"
+          "body": "Keep-Alive Active"
         }
       }
     }
@@ -41,15 +44,12 @@
       {
         "type": "field",
         "outboundTag": "block",
-        "domain": [
-          "geosite:category-ads-all",
+        "domain": ["geosite:category-ads-all",
           "geosite:category-ads-google",
-          "geosite:facebook",
           "geosite:category-mads",
           "domain:doubleclick.net",
           "domain:adservice.google.com",
-          "domain:ads.youtube.com"
-        ]
+          "domain:ads.youtube.com"]
       }
     ]
   }
