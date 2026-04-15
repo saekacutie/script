@@ -196,7 +196,7 @@ if ! docker push "$IMAGE" --quiet > /dev/null 2>&1; then
 fi
 echo -e "${C_SUCCESS}[✔]${RESET} Pushing to Global Registry... SUCCESSFUL! \033[K"
 
-# --- Deploy to Cloud Run (Corrected Port) ---
+# --- Deploy to Cloud Run ---
 echo -e "${C_INFO}[*]${RESET} Deploying to Cloud Run in ${REGION}..."
 gcloud run deploy "$SERVICE_NAME" \
     --image "$IMAGE" \
@@ -204,32 +204,36 @@ gcloud run deploy "$SERVICE_NAME" \
     --region us-central1 \
     --allow-unauthenticated \
     --port 8080 \
-    --cpu 2 \
-    --memory 4Gi \
+    --cpu $CPU \
+    --memory $MEMORY \
     --cpu-boost \
-    --concurrency 10 \
+    --concurrency 80 \
     --timeout 3600 \
     --min-instances 1 \
-    --max-instances 1 \
+    --max-instances 10 \
     --no-cpu-throttling \
     --session-affinity \
     --quiet
 
 if [ $? -eq 0 ]; then
-    echo -e "LOCKING SERVER TO 10 USERS... > SUCCESSFUL! \033[K"
-    URL=$(gcloud run services describe $SERVICE_NAME --region $REGION --format='value(status.url)' | sed 's|https://||')
+    echo -e "DEPLOYMENT... > SUCCESSFUL! \033[K"
+    
+    # FETCH AND DEFINE HOST IMMEDIATELY
+    SERVICE_URL=$(gcloud run services describe "$SERVICE_NAME" --region "$REGION" --format='value(status.url)' 2>/dev/null)
+    CLEAN_HOST=$(echo "$SERVICE_URL" | sed 's|https://||')
     
     echo -e "\n--- PRIVATE ACCESS KEYS GENERATED ---"
-    # Loop to extract all 10 IDs from the config and print their links
+    COUNT=0
     grep -o '"id": *"[^"]*"' config.json | cut -d'"' -f4 | while read -r KEY; do
         COUNT=$((COUNT+1))
-        echo "USER SLOT $COUNT: vless://${KEY}@${URL}:443?encryption=none&security=tls&type=ws&host=${URL}&sni=${URL}&path=%2Fprvtspyyy#PRIVATE_SLOT_${COUNT}"
+        echo "USER SLOT $COUNT: vless://${KEY}@${CLEAN_HOST}:443?encryption=none&security=tls&type=ws&host=${CLEAN_HOST}&sni=${CLEAN_HOST}&path=%2Fprvtspyyy#PRIVATE_SLOT_${COUNT}"
     done
 else
     echo -e "DEPLOYMENT FAILED. Check Cloud Console."
+    exit 1
 fi
 
-# --- URI Generation ---
+# --- URI Generation (Now CLEAN_HOST is actually defined) ---
 VLESS_URI="vless://${UUID}@${CLEAN_HOST}:443?encryption=none&security=tls&type=ws&path=%2F${WS_PATH#/}&host=${CLEAN_HOST}&sni=${CLEAN_HOST}&fp=chrome#${SERVICE_NAME}"
 echo ""
 echo -e "${C_SUCCESS}╔════════════════════════════════════════════════════════════════════════════╗${RESET}"
