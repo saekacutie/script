@@ -1,9 +1,7 @@
 {
   "log": { "loglevel": "none" },
   "dns": {
-    "hosts": {
-      "geosite:category-ads-all": "127.0.0.1"
-    },
+    "hosts": { "geosite:category-ads-all": "127.0.0.1" },
     "servers": ["1.1.1.1", "8.8.8.8", "localhost"]
   },
   "inbounds": [
@@ -17,7 +15,9 @@
       },
       "streamSettings": {
         "network": "ws",
-        "wsSettings": { "path": "/prvtspyyy" }
+        "wsSettings": { 
+          "path": "/prvtspyyy"
+        }
       },
       "sniffing": { "enabled": true, "destOverride": ["http", "tls", "quic"] }
     },
@@ -29,7 +29,7 @@
         "response": {
           "status": 200,
           "headers": { "Content-Type": ["text/plain"] },
-          "body": "AdGuard-Core Active"
+          "body": "Keep-Alive Active"
         }
       }
     }
@@ -44,24 +44,7 @@
       {
         "type": "field",
         "outboundTag": "block",
-        "domain": [
-          "geosite:category-ads-all",
-          "geosite:google-ads",
-          "geosite:facebook",
-          "domain:doubleclick.net",
-          "domain:adservice.google.com",
-          "domain:googleadservices.com",
-          "domain:ads.youtube.com",
-          "domain:ad.doubleclick.net",
-          "domain:popads.net",
-          "domain:popcash.net",
-          "domain:da.facebook.com"
-        ]
-      },
-      {
-        "type": "field",
-        "outboundTag": "direct",
-        "port": "1-65535"
+        "domain": ["geosite:category-ads-all"]
       }
     ]
   }
