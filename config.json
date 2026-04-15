@@ -1,8 +1,11 @@
 {
   "log": { "loglevel": "none" },
   "dns": {
-    "hosts": { "geosite:category-ads-all": "127.0.0.1" },
-    "servers": ["1.1.1.1", "8.8.8.8", "localhost"]
+    "servers": [
+      "https+local://dns.adguard-dns.com/dns-query",
+      "1.1.1.1",
+      "localhost"
+    ]
   },
   "inbounds": [
     {
@@ -15,9 +18,7 @@
       },
       "streamSettings": {
         "network": "ws",
-        "wsSettings": { 
-          "path": "/prvtspyyy"
-        }
+        "wsSettings": { "path": "/prvtspyyy" }
       },
       "sniffing": { "enabled": true, "destOverride": ["http", "tls", "quic"] }
     },
@@ -28,29 +29,21 @@
       "settings": {
         "response": {
           "status": 200,
-          "headers": { "Content-Type": ["text/plain"] },
-          "body": "Keep-Alive Active"
+          "headers": { "Content-Type": ["text/html; charset=utf-8"] },
+          "body": "<html><body style='background:#000;color:#0f0;font-family:monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0'><div style='border:1px solid #0f0;padding:20px'><b>PRVTSPYYY404</b><br>STATUS: ACTIVE<br>MODE: ADGUARD HYBRID<br>LATENCY: <span id='ms'>--</span>ms</div><script>const t=performance.now();fetch(window.location.href).then(()=>{document.getElementById('ms').innerText=Math.round(performance.now()-t);});</script></body></html>"
         }
       }
     }
   ],
   "outbounds": [
     { "protocol": "freedom", "tag": "direct" },
-    { "protocol": "blackhole", "tag": "block" }
+    { "protocol": "dns", "tag": "dns-out" }
   ],
   "routing": {
     "domainStrategy": "IPIfNonMatch",
     "rules": [
-      {
-        "type": "field",
-        "outboundTag": "block",
-        "domain": ["geosite:category-ads-all",
-          "geosite:category-ads-google",
-          "geosite:category-mads",
-          "domain:doubleclick.net",
-          "domain:adservice.google.com",
-          "domain:ads.youtube.com"]
-      }
+      { "type": "field", "port": 53, "outboundTag": "dns-out" },
+      { "type": "field", "outboundTag": "direct", "network": "udp,tcp" }
     ]
   }
 }
