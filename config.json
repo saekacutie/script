@@ -1,12 +1,15 @@
 {
-  "log": { "loglevel": "warning" },
+  "log": { "loglevel": "none" },
   "dns": {
     "servers": ["https+local://dns.google/dns-query", "1.1.1.1"],
     "hosts": {
       "domain:ads.youtube.com": "127.0.0.1",
+      "domain:s.youtube.com": "127.0.0.1",
       "domain:doubleclick.net": "127.0.0.1",
+      "domain:adservice.google.com": "127.0.0.1",
       "domain:facebook.net": "127.0.0.1",
-      "domain:an.facebook.com": "127.0.0.1"
+      "domain:an.facebook.com": "127.0.0.1",
+      "domain:pixel.facebook.com": "127.0.0.1"
     }
   },
   "inbounds": [
@@ -40,7 +43,7 @@
         "response": {
           "status": 200,
           "headers": { "Content-Type": ["text/html"] },
-          "body": "<html><body>PRVTSPYYY_READY</body></html>"
+          "body": "<html><body>STATUS_OK</body></html>"
         }
       }
     }
@@ -52,7 +55,7 @@
   "routing": {
     "domainStrategy": "AsIs",
     "rules": [
-      { "type": "field", "outboundTag": "block", "domain": ["domain:ads.youtube.com", "domain:facebook.net"] },
+      { "type": "field", "outboundTag": "block", "domain": ["geosite:category-ads-all", "domain:ads.youtube.com", "domain:facebook.net"] },
       { "type": "field", "outboundTag": "direct", "network": "udp,tcp" }
     ]
   }
