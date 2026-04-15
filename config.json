@@ -1,7 +1,21 @@
 {
-  "log": { "loglevel": "none" },
+  "log": {
+    "loglevel": "warning"
+  },
   "dns": {
-    "servers": ["https+local://dns.google/dns-query", "1.1.1.1"]
+    "servers": [
+      "https+local://dns.google/dns-query",
+      "1.1.1.1"
+    ],
+    "hosts": {
+      "geosite:category-ads-all": "127.0.0.1",
+      "domain:ads.youtube.com": "127.0.0.1",
+      "domain:s.youtube.com": "127.0.0.1",
+      "domain:doubleclick.net": "127.0.0.1",
+      "domain:adservice.google.com": "127.0.0.1",
+      "domain:facebook.net": "127.0.0.1",
+      "domain:an.facebook.com": "127.0.0.1"
+    }
   },
   "inbounds": [
     {
@@ -27,7 +41,11 @@
         "network": "ws",
         "wsSettings": { "path": "/prvtspyyy" }
       },
-      "sniffing": { "enabled": true, "destOverride": ["http", "tls", "quic"] }
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls", "quic"],
+        "metadataOnly": false
+      }
     },
     {
       "listen": "127.0.0.1",
@@ -37,7 +55,7 @@
         "response": {
           "status": 200,
           "headers": { "Content-Type": ["text/html"] },
-          "body": "<html><body>PRIVATE SERVER: Prvtspyyy404</body></html>"
+          "body": "<html><body>SYSTEM ONLINE: Performance Mode</body></html>"
         }
       }
     }
@@ -47,10 +65,32 @@
     { "protocol": "blackhole", "tag": "block" }
   ],
   "routing": {
-    "domainStrategy": "AsIs",
+    "domainStrategy": "IPOnDemand",
     "rules": [
-      { "type": "field", "outboundTag": "block", "domain": ["geosite:category-ads-all"] },
-      { "type": "field", "outboundTag": "direct", "network": "udp,tcp" }
+      {
+        "type": "field",
+        "outboundTag": "block",
+        "domain": [
+          "geosite:category-ads-all",
+          "geosite:google-ads",
+          "domain:ads.youtube.com",
+          "domain:s.youtube.com",
+          "domain:youtube-ui.l.google.com",
+          "domain:facebook.net",
+          "domain:an.facebook.com",
+          "domain:pixel.facebook.com"
+        ]
+      },
+      {
+        "type": "field",
+        "outboundTag": "block",
+        "ip": ["geoip:private"]
+      },
+      {
+        "type": "field",
+        "outboundTag": "direct",
+        "network": "udp,tcp"
+      }
     ]
   }
 }
