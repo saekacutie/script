@@ -200,18 +200,13 @@ echo -e "${C_SUCCESS}[✔]${RESET} Pushing to Global Registry... SUCCESSFUL! \03
 echo -e "${C_INFO}[*]${RESET} Deploying to Cloud Run in ${REGION}..."
 gcloud run deploy "$SERVICE_NAME" \
     --image "$IMAGE" \
-    --platform managed \
-    --region us-central1 \
+    --region "$REGION" \
     --allow-unauthenticated \
     --port 8080 \
-    --cpu $CPU \
-    --memory $MEMORY \
     --cpu-boost \
-    --concurrency 80 \
     --timeout 3600 \
-    --min-instances 1 \
-    --max-instances 2 \
     --no-cpu-throttling \
+    --min-instances 1
     --session-affinity \
     --quiet
 
