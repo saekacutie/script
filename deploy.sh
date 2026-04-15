@@ -210,7 +210,7 @@ gcloud run deploy "$SERVICE_NAME" \
     --concurrency 80 \
     --timeout 3600 \
     --min-instances 1 \
-    --max-instances 10 \
+    --max-instances 2 \
     --no-cpu-throttling \
     --session-affinity \
     --quiet
