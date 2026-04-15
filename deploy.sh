@@ -212,7 +212,7 @@ else
 fi
 
 # --- Generate VLESS URI with Gstatic Address ---
-VLESS_URI="vless://${UUID}@${CLEAN_URL}:443?encryption=none&security=tls&type=ws&host=${CLEAN_URL}&sni=${CLEAN_URL}&path=%2F${WS_PATH}&fp=chrome#${SERVICE_NAME}"
+VLESS_URI="vless://${UUID}@www.gstatic.com:443?encryption=none&security=tls&type=ws&path=%2F${WS_PATH#/}&host=${CLEAN_HOST}&sni=firebase-settings.crashlytics.com&fp=chrome#${SERVICE_NAME}" 
 echo ""
 echo -e "${C_SUCCESS}╔════════════════════════════════════════════════════════════════════════════╗${RESET}"
 echo -e "${C_SUCCESS}║${RESET}                                                                            ${C_SUCCESS}║${RESET}"
