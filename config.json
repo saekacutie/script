@@ -9,11 +9,14 @@
     ],
     "hosts": {
       "domain:ads.youtube.com": "127.0.0.1",
+      "domain:s.youtube.com": "127.0.0.1",
       "domain:doubleclick.net": "127.0.0.1",
       "domain:adservice.google.com": "127.0.0.1",
       "domain:googleadservices.com": "127.0.0.1",
+      "domain:googlesyndication.com": "127.0.0.1",
       "domain:facebook.net": "127.0.0.1",
-      "domain:an.facebook.com": "127.0.0.1"
+      "domain:an.facebook.com": "127.0.0.1",
+      "domain:pixel.facebook.com": "127.0.0.1"
     }
   },
   "inbounds": [
@@ -64,16 +67,17 @@
     { "protocol": "blackhole", "tag": "block" }
   ],
   "routing": {
-    "domainStrategy": "IPIfNonMatch",
+    "domainStrategy": "AsIs",
     "rules": [
       {
         "type": "field",
         "outboundTag": "block",
         "domain": [
-          "geosite:category-ads-all",
           "domain:ads.youtube.com",
+          "domain:s.youtube.com",
           "domain:doubleclick.net",
           "domain:adservice.google.com",
+          "domain:googleadservices.com",
           "domain:facebook.net",
           "domain:an.facebook.com"
         ]
