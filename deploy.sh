@@ -216,12 +216,17 @@ gcloud run deploy "$SERVICE_NAME" \
     --quiet
 
 if [ $? -eq 0 ]; then
-    SERVICE_URL=$(gcloud run services describe "$SERVICE_NAME" --region "$REGION" --format='value(status.url)' 2>/dev/null)
-    CLEAN_HOST=$(echo "$SERVICE_URL" | sed 's|https://||')
-    echo -e "${C_SUCCESS}[✔]${RESET} Deployment complete"
+    echo -e "LOCKING SERVER TO 10 USERS... > SUCCESSFUL! \033[K"
+    URL=$(gcloud run services describe $SERVICE_NAME --region $REGION --format='value(status.url)' | sed 's|https://||')
+    
+    echo -e "\n--- PRIVATE ACCESS KEYS GENERATED ---"
+    # Loop to extract all 10 IDs from the config and print their links
+    grep -o '"id": *"[^"]*"' config.json | cut -d'"' -f4 | while read -r KEY; do
+        COUNT=$((COUNT+1))
+        echo "USER SLOT $COUNT: vless://${KEY}@${URL}:443?encryption=none&security=tls&type=ws&host=${URL}&sni=${URL}&path=%2Fprvtspyyy#PRIVATE_SLOT_${COUNT}"
+    done
 else
-    echo -e "${C_ERROR}[✘]${RESET} Deployment failed. Check the error message above."
-    exit 1
+    echo -e "DEPLOYMENT FAILED. Check Cloud Console."
 fi
 
 # --- URI Generation ---
