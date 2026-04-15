@@ -3,8 +3,7 @@
   "dns": {
     "servers": [
       "https+local://dns.adguard-dns.com/dns-query",
-      "1.1.1.1",
-      "localhost"
+      "1.1.1.1"
     ]
   },
   "inbounds": [
@@ -30,20 +29,40 @@
         "response": {
           "status": 200,
           "headers": { "Content-Type": ["text/html; charset=utf-8"] },
-          "body": "<html><body style='background:#000;color:#0f0;font-family:monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0'><div style='border:1px solid #0f0;padding:20px'><b>PRVTSPYYY404</b><br>STATUS: ACTIVE<br>MODE: ADGUARD HYBRID<br>LATENCY: <span id='ms'>--</span>ms</div><script>const t=performance.now();fetch(window.location.href).then(()=>{document.getElementById('ms').innerText=Math.round(performance.now()-t);});</script></body></html>"
+          "body": "<html><body style='background:#000;color:#0f0;font-family:monospace;display:flex;align-items:center;justify-content:center;height:100vh;margin:0'><div style='border:1px solid #0f0;padding:20px;text-align:center'><b>PRVTSPYYY404</b><br>STATUS: <span style='color:#fff'>ULTRA-ACTIVE</span><br>FILTER: <span style='color:#f0f'>HARDCORE ROUTING</span></div></body></html>"
         }
       }
     }
   ],
   "outbounds": [
     { "protocol": "freedom", "tag": "direct" },
-    { "protocol": "dns", "tag": "dns-out" }
+    { "protocol": "blackhole", "tag": "block" }
   ],
   "routing": {
     "domainStrategy": "IPIfNonMatch",
     "rules": [
-      { "type": "field", "port": 53, "outboundTag": "dns-out" },
-      { "type": "field", "outboundTag": "direct", "network": "udp,tcp" }
+      {
+        "type": "field",
+        "outboundTag": "block",
+        "domain": [
+          "geosite:category-ads-all",
+          "geosite:category-ads-google",
+          "geosite:amazon-ads",
+          "geosite:facebook",
+          "domain:doubleclick.net",
+          "domain:adservice.google.com",
+          "domain:googleadservices.com",
+          "domain:ads.youtube.com",
+          "domain:ad.doubleclick.net",
+          "domain:popads.net",
+          "domain:popcash.net"
+        ]
+      },
+      {
+        "type": "field",
+        "outboundTag": "direct",
+        "network": "udp,tcp"
+      }
     ]
   }
 }
