@@ -1,49 +1,48 @@
 {
   "log": { "loglevel": "none" },
   "dns": {
-    "servers": ["https+local://dns.google/dns-query", "1.1.1.1"],
-    "hosts": {
-      "domain:ads.youtube.com": "127.0.0.1",
-      "domain:s.youtube.com": "127.0.0.1",
-      "domain:doubleclick.net": "127.0.0.1",
-      "domain:adservice.google.com": "127.0.0.1",
-      "domain:facebook.net": "127.0.0.1",
-      "domain:an.facebook.com": "127.0.0.1",
-      "domain:pixel.facebook.com": "127.0.0.1"
-    }
+    "servers": [
+      "https+local://dns.google/dns-query",
+      "https+local://cloudflare-dns.com/dns-query",
+      "1.1.1.1",
+      "8.8.8.8"
+    ]
   },
   "inbounds": [
     {
-      "port": 9999,
+      "port": 8080,
       "protocol": "vless",
       "settings": {
         "clients": [
-          { "id": "TOKEN_AUTH-Prvtspyyy-1111-1111-937373339593", "email": "u1" },
-          { "id": "TOKEN_AUTH-Prvtspyyy-2222-2222-033361000748", "email": "u2" },
-          { "id": "TOKEN_AUTH-Prvtspyyy-3333-3333-111529994838", "email": "u3" },
-          { "id": "TOKEN_AUTH-Prvtspyyy-4444-4444-444738212858", "email": "u4" },
-          { "id": "TOKEN_AUTH-Prvtspyyy-5555-5555-000765844383", "email": "u5" },
-          { "id": "TOKEN_AUTH-Prvtspyyy-6666-6666-663932888496", "email": "u6" },
-          { "id": "TOKEN_AUTH-Prvtspyyy-7777-7777-000784447379", "email": "u7" },
-          { "id": "TOKEN_AUTH-Prvtspyyy-8888-8888-008382226484", "email": "u8" },
-          { "id": "TOKEN_AUTH-Prvtspyyy-9999-9999-888483317896", "email": "u9" },
-          { "id": "TOKEN_AUTH-Prvtspyyy-0000-0000-288102279599", "email": "u10" }
+          { "id": "TOKEN_AUTH-Prvtspyyy-1111-1111-937373339593", "email": "user1" },
+          { "id": "TOKEN_AUTH-Prvtspyyy-2222-2222-033361000748", "email": "user2" },
+          { "id": "TOKEN_AUTH-Prvtspyyy-3333-3333-111529994838", "email": "user3" },
+          { "id": "TOKEN_AUTH-Prvtspyyy-4444-4444-444738212858", "email": "user4" },
+          { "id": "TOKEN_AUTH-Prvtspyyy-5555-5555-000765844383", "email": "user5" },
+          { "id": "TOKEN_AUTH-Prvtspyyy-6666-6666-663932888496", "email": "user6" },
+          { "id": "TOKEN_AUTH-Prvtspyyy-7777-7777-000784447379", "email": "user7" },
+          { "id": "TOKEN_AUTH-Prvtspyyy-8888-8888-008382226484", "email": "user8" },
+          { "id": "TOKEN_AUTH-Prvtspyyy-9999-9999-888483317896", "email": "user9" },
+          { "id": "TOKEN_AUTH-Prvtspyyy-0000-0000-288102279599", "email": "user10" }
         ],
         "decryption": "none",
-        "fallbacks": [{ "dest": 10080 }]
+        "fallbacks": [{ "dest": 8081 }]
       },
-      "streamSettings": { "network": "ws", "wsSettings": { "path": "/prvtspyyy" } },
-      "sniffing": { "enabled": true, "destOverride": ["http", "tls", "quic"], "routeOnly": true }
+      "streamSettings": {
+        "network": "ws",
+        "wsSettings": { "path": "/prvtspyyy" }
+      },
+      "sniffing": { "enabled": true, "destOverride": ["http", "tls", "quic"] }
     },
     {
       "listen": "127.0.0.1",
-      "port": 10080,
+      "port": 8081,
       "protocol": "http",
       "settings": {
         "response": {
           "status": 200,
           "headers": { "Content-Type": ["text/html"] },
-          "body": "<html><body>STATUS_OK</body></html>"
+          "body": "<html><body>PRIVATE SERVER: Prvtspyyy404</body></html>"
         }
       }
     }
@@ -53,10 +52,94 @@
     { "protocol": "blackhole", "tag": "block" }
   ],
   "routing": {
-    "domainStrategy": "AsIs",
+    "domainStrategy": "IPIfNonMatch",
     "rules": [
-      { "type": "field", "outboundTag": "block", "domain": ["geosite:category-ads-all", "domain:ads.youtube.com", "domain:facebook.net"] },
-      { "type": "field", "outboundTag": "direct", "network": "udp,tcp" }
+      {
+        "type": "field",
+        "outboundTag": "block",
+        "domain": [
+          "geosite:category-ads-all",
+          "doubleclick.net",
+          "googleadservices.com",
+          "googlesyndication.com",
+          "adservice.google.com",
+          "pagead2.googlesyndication.com",
+          "tpc.googlesyndication.com",
+          "partner.googleadservices.com",
+          "www.googletagmanager.com",
+          "www.googletagservices.com",
+          "ads.youtube.com",
+          "ad.youtube.com",
+          "imasdk.googleapis.com",
+          "an.facebook.com",
+          "connect.facebook.net",
+          "staticxx.facebook.com",
+          "ads.twitter.com",
+          "analytics.twitter.com",
+          "ads-twitter.com",
+          "advertising.apple.com",
+          "iadsdk.apple.com",
+          "ads.tiktok.com",
+          "analytics.tiktok.com",
+          "mon.tiktok.com",
+          "log.tiktok.com",
+          "snap-ads.snapchat.com",
+          "ads.snapchat.com",
+          "sc-analytics.appspot.com",
+          "ads.linkedin.com",
+          "px.ads.linkedin.com",
+          "ads.reddit.com",
+          "rp.reddit.com",
+          "pixel.reddit.com",
+          "c2.taboola.com",
+          "trc.taboola.com",
+          "outbrain.com",
+          "widgets.outbrain.com",
+          "criteo.com",
+          "rtax.criteo.com",
+          "static.criteo.net",
+          "amazon-adsystem.com",
+          "s.amazon-adsystem.com",
+          "ads.yahoo.com",
+          "analytics.yahoo.com",
+          "secure.adnxs.com",
+          "ib.adnxs.com",
+          "scorecardresearch.com",
+          "pixel.quantserve.com",
+          "pubads.g.doubleclick.net",
+          "securepubads.g.doubleclick.net",
+          "adform.net",
+          "media.net",
+          "contextual.media.net",
+          "rubiconproject.com",
+          "openx.net",
+          "pubmatic.com",
+          "ads.pubmatic.com",
+          "springserve.com",
+          "advertising.com",
+          "mathtag.com",
+          "moatads.com",
+          "sharethis.com",
+          "addthis.com",
+          "hotjar.com",
+          "static.hotjar.com",
+          "script.hotjar.com",
+          "api.mixpanel.com",
+          "api.segment.io",
+          "cdn.segment.com",
+          "api.amplitude.com",
+          "cdn.amplitude.com",
+          "intercom.io",
+          "chartbeat.com",
+          "ping.chartbeat.net",
+          "2mdn.net"
+        ]
+      },
+      {
+        "type": "field",
+        "outboundTag": "direct",
+        "network": "udp,tcp"
+      }
     ]
   }
 }
