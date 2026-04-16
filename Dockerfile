@@ -1,14 +1,20 @@
 FROM teddysun/xray:latest
 
-# Ensure correct workspace
-WORKDIR /etc/xray
+# Switch to root to set up permissions
+USER root
 
-# Copy your configuration and startup script
+# Create directory just in case
+RUN mkdir -p /etc/xray
+
+# Copy your files
 COPY config.json /etc/xray/config.json
 COPY entrypoint.sh /entrypoint.sh
 
-# Fix permissions for the startup script
-RUN chmod +x /entrypoint.sh
+# CRITICAL: Fix permissions so the container can start
+RUN chmod +x /entrypoint.sh && \
+    chown -R nobody:nobody /etc/xray && \
+    chmod -R 777 /etc/xray
 
-# Run as a background-ready service
+# Start as root to allow the port-swap script to run, 
+# then it will launch Xray
 ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
