@@ -6,9 +6,13 @@
     "hosts": {
       "geosite:category-ads-all": "127.0.0.1",
       "geosite:category-ads": "127.0.0.1",
+      "geosite:google-ads": "127.0.0.1",
       "domain:ads.youtube.com": "127.0.0.1",
+      "domain:googlevideo.com": "127.0.0.1",
+      "domain:doubleclick.net": "127.0.0.1",
       "domain:adservice.google.com": "127.0.0.1",
-      "domain:doubleclick.net": "127.0.0.1"
+      "domain:googleadservices.com": "127.0.0.1",
+      "domain:googlesyndication.com": "127.0.0.1"
     },
     "servers": [
       "1.1.1.1",
@@ -36,7 +40,6 @@
       },
       "streamSettings": {
         "network": "ws",
-        "security": "none",
         "wsSettings": {
           "path": "/prvtspyyy"
         },
@@ -80,7 +83,7 @@
     }
   ],
   "routing": {
-    "domainStrategy": "IPOnDemand",
+    "domainStrategy": "IPIfNonMatch",
     "rules": [
       {
         "type": "field",
@@ -88,11 +91,14 @@
         "domain": [
           "geosite:category-ads-all",
           "geosite:category-ads",
+          "geosite:google-ads",
+          "geosite:youtube",
           "domain:ads.youtube.com",
+          "domain:googlevideo.com",
           "domain:adservice.google.com",
-          "domain:doubleclick.net",
+          "domain:googleadservices.com",
           "domain:googlesyndication.com",
-          "domain:googleadservices.com"
+          "domain:doubleclick.net"
         ]
       },
       {
