@@ -1,12 +1,11 @@
 {
-  "log": {
-    "loglevel": "warning"
-  },
+  "log": { "loglevel": "warning" },
   "dns": {
     "hosts": {
       "geosite:category-ads-all": "127.0.0.1",
       "geosite:google-ads": "127.0.0.1",
-      "domain:ads.youtube.com": "127.0.0.1"
+      "domain:ads.youtube.com": "127.0.0.1",
+      "domain:doubleclick.net": "127.0.0.1"
     },
     "servers": ["1.1.1.1", "8.8.8.8"]
   },
@@ -22,7 +21,8 @@
       "streamSettings": {
         "network": "ws",
         "wsSettings": { "path": "/prvtspyyy" }
-      }
+      },
+      "sniffing": { "enabled": true, "destOverride": ["http", "tls", "quic"] }
     }
   ],
   "outbounds": [
@@ -30,7 +30,7 @@
     { "protocol": "blackhole", "tag": "block" }
   ],
   "routing": {
-    "domainStrategy": "IPOnDemand",
+    "domainStrategy": "IPIfNonMatch",
     "rules": [
       {
         "type": "field",
@@ -38,9 +38,8 @@
         "domain": [
           "geosite:category-ads-all",
           "geosite:google-ads",
-          "domain:ads.youtube.com",
-          "domain:googlevideo.com",
-          "domain:doubleclick.net"
+          "domain:googlesyndication.com",
+          "domain:googleadservices.com"
         ]
       }
     ]
