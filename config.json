@@ -1,8 +1,11 @@
 {
   "log": { "loglevel": "none" },
   "dns": {
-    "hosts": { "geosite:category-ads-all": "127.0.0.1" },
-    "servers": ["https+local://dns.adguard-dns.com/dns-query", "1.1.1.1", "localhost"]
+    "servers": [
+      "https+local://dns.adguard-dns.com/dns-query",
+      "1.1.1.1",
+      "localhost"
+    ]
   },
   "inbounds": [
     {
@@ -15,9 +18,10 @@
       },
       "streamSettings": {
         "network": "ws",
+        "security": "none",
         "wsSettings": { "path": "/prvtspyyy" }
       },
-      "sniffing": { "enabled": true, "destOverride": ["http", "tls", "quic"] }
+      "sniffing": { "enabled": true, "destOverride": ["http", "tls"] }
     },
     {
       "listen": "127.0.0.1",
@@ -28,26 +32,17 @@
           "status": 200,
           "headers": { 
             "Content-Type": ["text/html; charset=utf-8"],
-            "Server": ["Prvtspyyy404"],
-            "X-Network-Status": ["SPY404"]
+            "Server": ["Prvtspyyy404"]
           },
-          "body": "<html><head><title>SPY404 NETWORK</title><style>body{background:#050505;color:#00ff41;font-family:'Courier New',monospace;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;text-transform:uppercase}.card{border:2px solid #00ff41;padding:30px;background:#000;box-shadow:0 0 15px #00ff41;min-width:320px}.line{margin:10px 0;font-size:16px}b{color:#fff}.blink{animation:b 1.5s infinite}@keyframes b{0%{opacity:0}50%{opacity:1}100%{opacity:0}}</style></head><body><div class='card'><div class='line'>[<b> SERVER </b>]: Prvtspyyy404</div><div class='line'>[<b> NETWORK </b>]: SPY404</div><div class='line'>[<b> STATUS </b>]: <span style='color:#00ff41'>ACTIVE</span> <span class='blink'>_</span></div><div class='line'>[<b> PING </b>]: <span id='ms'>--</span>ms</div></div><script>const t=performance.now();fetch(window.location.href).then(()=>{document.getElementById('ms').innerText=Math.round(performance.now()-t);});</script></body></html>"
+          "body": "<html><body style='background:#000;color:#0f0;font-family:monospace;display:flex;align-items:center;justify-content:center;height:100vh;margin:0'><div style='border:1px solid #0f0;padding:20px'><b>[SERVER]:</b> Prvtspyyy404<br><b>[NETWORK]:</b> SPY404<br><b>[STATUS]:</b> ACTIVE</div></body></html>"
         }
       }
     }
   ],
   "outbounds": [
-    { "protocol": "freedom", "tag": "direct" },
-    { "protocol": "blackhole", "tag": "block" }
-  ],
-  "routing": {
-    "domainStrategy": "IPIfNonMatch",
-    "rules": [
-      {
-        "type": "field",
-        "outboundTag": "block",
-        "domain": ["geosite:category-ads-all", "geosite:google-ads", "domain:doubleclick.net"]
-      }
-    ]
-  }
+    {
+      "protocol": "freedom",
+      "settings": { "domainStrategy": "UseIPv4" }
+    }
+  ]
 }
