@@ -58,7 +58,8 @@
           "body": "Keep-Alive Active"
         }
       }
-{
+    }
+  ],
   "outbounds": [
     {
       "protocol": "freedom",
