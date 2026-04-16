@@ -5,20 +5,10 @@
   "dns": {
     "hosts": {
       "geosite:category-ads-all": "127.0.0.1",
-      "geosite:category-ads": "127.0.0.1",
       "geosite:google-ads": "127.0.0.1",
-      "domain:ads.youtube.com": "127.0.0.1",
-      "domain:googlevideo.com": "127.0.0.1",
-      "domain:doubleclick.net": "127.0.0.1",
-      "domain:adservice.google.com": "127.0.0.1",
-      "domain:googleadservices.com": "127.0.0.1",
-      "domain:googlesyndication.com": "127.0.0.1"
+      "domain:ads.youtube.com": "127.0.0.1"
     },
-    "servers": [
-      "1.1.1.1",
-      "8.8.8.8",
-      "localhost"
-    ]
+    "servers": ["1.1.1.1", "8.8.8.8"]
   },
   "inbounds": [
     {
@@ -26,85 +16,32 @@
       "port": 8080,
       "protocol": "vless",
       "settings": {
-        "clients": [
-          {
-            "id": "9e507b33-65b6-40a4-b37f-eabad158b645"
-          }
-        ],
-        "decryption": "none",
-        "fallbacks": [
-          {
-            "dest": 8081
-          }
-        ]
+        "clients": [{ "id": "9e507b33-65b6-40a4-b37f-eabad158b645" }],
+        "decryption": "none"
       },
       "streamSettings": {
         "network": "ws",
-        "wsSettings": {
-          "path": "/prvtspyyy"
-        },
-        "sockopt": {
-          "tcpKeepAliveInterval": 5,
-          "tcpKeepAliveIdle": 15,
-          "mark": 0
-        }
-      },
-      "sniffing": {
-        "enabled": true,
-        "destOverride": ["http", "tls", "quic"]
-      }
-    },
-    {
-      "listen": "127.0.0.1",
-      "port": 8081,
-      "protocol": "http",
-      "settings": {
-        "response": {
-          "status": 200,
-          "headers": {
-            "Content-Type": ["text/plain"]
-          },
-          "body": "Keep-Alive Active"
-        }
+        "wsSettings": { "path": "/prvtspyyy" }
       }
     }
   ],
   "outbounds": [
-    {
-      "protocol": "freedom",
-      "tag": "direct",
-      "settings": {
-        "domainStrategy": "UseIP"
-      }
-    },
-    {
-      "protocol": "blackhole",
-      "tag": "block"
-    }
+    { "protocol": "freedom", "tag": "direct" },
+    { "protocol": "blackhole", "tag": "block" }
   ],
   "routing": {
-    "domainStrategy": "IPIfNonMatch",
+    "domainStrategy": "IPOnDemand",
     "rules": [
       {
         "type": "field",
         "outboundTag": "block",
         "domain": [
           "geosite:category-ads-all",
-          "geosite:category-ads",
           "geosite:google-ads",
-          "geosite:youtube",
           "domain:ads.youtube.com",
           "domain:googlevideo.com",
-          "domain:adservice.google.com",
-          "domain:googleadservices.com",
-          "domain:googlesyndication.com",
           "domain:doubleclick.net"
         ]
-      },
-      {
-        "type": "field",
-        "outboundTag": "direct",
-        "network": "tcp,udp"
       }
     ]
   }
