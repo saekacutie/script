@@ -1,9 +1,14 @@
 {
   "log": { "loglevel": "none" },
   "dns": {
+    "hosts": {
+      "geosite:category-ads-all": "127.0.0.1",
+      "geosite:category-ads-ads": "127.0.0.1"
+    },
     "servers": [
-      "https+local://dns.adguard-dns.com/dns-query",
-      "1.1.1.1"
+      "https+local://8.8.8.8/dns-query",
+      "1.1.1.1",
+      "localhost"
     ]
   },
   "inbounds": [
@@ -19,7 +24,10 @@
         "network": "ws",
         "wsSettings": { "path": "/prvtspyyy" }
       },
-      "sniffing": { "enabled": true, "destOverride": ["http", "tls", "quic"] }
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls", "quic"]
+      }
     },
     {
       "listen": "127.0.0.1",
@@ -28,8 +36,11 @@
       "settings": {
         "response": {
           "status": 200,
-          "headers": { "Content-Type": ["text/html; charset=utf-8"] },
-          "body": "<html><body style='background:#000;color:#0f0;font-family:monospace;display:flex;align-items:center;justify-content:center;height:100vh;margin:0'><div style='border:1px solid #0f0;padding:20px;text-align:center'><b>PRVTSPYYY404</b><br>STATUS: <span style='color:#fff'>ULTRA-ACTIVE</span><br>FILTER: <span style='color:#f0f'>HARDCORE ROUTING</span></div></body></html>"
+          "headers": { 
+            "Content-Type": ["text/plain"],
+            "X-Status": "200K"
+          },
+          "body": "Prvtspyyy404 [Status: 200K] - AdBlock Active"
         }
       }
     }
@@ -39,29 +50,16 @@
     { "protocol": "blackhole", "tag": "block" }
   ],
   "routing": {
-    "domainStrategy": "IPIfNonMatch",
+    "domainStrategy": "AsIs",
     "rules": [
       {
         "type": "field",
         "outboundTag": "block",
         "domain": [
           "geosite:category-ads-all",
-          "geosite:category-ads-google",
-          "geosite:amazon-ads",
-          "geosite:facebook",
-          "domain:doubleclick.net",
-          "domain:adservice.google.com",
-          "domain:googleadservices.com",
-          "domain:ads.youtube.com",
-          "domain:ad.doubleclick.net",
-          "domain:popads.net",
-          "domain:popcash.net"
+          "geosite:category-ads-ads",
+          "geosite:google-ads"
         ]
-      },
-      {
-        "type": "field",
-        "outboundTag": "direct",
-        "network": "udp,tcp"
       }
     ]
   }
