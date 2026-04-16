@@ -1,36 +1,17 @@
 {
-  "log": {
-    "loglevel": "none"
-  },
-  "dns": {
-    "servers": [
-      "https+local://94.140.14.14/dns-query",
-      "1.1.1.1",
-      "localhost"
-    ]
-  },
+  "log": { "loglevel": "none" },
   "inbounds": [
     {
       "port": 8080,
       "protocol": "vless",
       "settings": {
-        "clients": [
-          {
-            "id": "9e507b33-65b6-40a4-b37f-eabad158b645"
-          }
-        ],
+        "clients": [{ "id": "9e507b33-65b6-40a4-b37f-eabad158b645" }],
         "decryption": "none",
-        "fallbacks": [
-          {
-            "dest": 8081
-          }
-        ]
+        "fallbacks": [{ "dest": 8081 }]
       },
       "streamSettings": {
         "network": "ws",
-        "wsSettings": {
-          "path": "/prvtspyyy"
-        }
+        "wsSettings": { "path": "/prvtspyyy" }
       }
     },
     {
@@ -40,43 +21,15 @@
       "settings": {
         "response": {
           "status": 200,
-          "headers": {
+          "headers": { 
             "Content-Type": ["text/plain"],
-            "Server": "Prvtspyyy404",
             "X-Status": "2000K",
             "X-System-Status": "Active-Keep-Alive"
           },
-          "body": "NETWORK 404 SPY [Status: 200 0K]"
+          "body": "Prvtspyyy404 [Status: 2000K]"
         }
       }
     }
   ],
-  "outbounds": [
-    {
-      "protocol": "freedom",
-      "tag": "direct"
-    },
-    {
-      "protocol": "blackhole",
-      "tag": "block"
-    }
-  ],
-  "routing": {
-    "domainStrategy": "IPIfNonMatch",
-    "rules": [
-      {
-        "type": "field",
-        "outboundTag": "block",
-        "domain": [
-          "geosite:category-ads-all",
-          "geosite:facebook",
-        ]
-      },
-      {
-        "type": "field",
-        "outboundTag": "direct",
-        "port": "0-65535"
-      }
-    ]
-  }
+  "outbounds": [{ "protocol": "freedom" }]
 }
