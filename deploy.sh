@@ -196,35 +196,31 @@ if ! docker push "$IMAGE" --quiet > /dev/null 2>&1; then
 fi
 echo -e "${C_SUCCESS}[✔]${RESET} Pushing to Global Registry... SUCCESSFUL! \033[K"
 
-# --- Deploy to Cloud Run ---
+# --- Deploy to Cloud Run (Corrected Port) ---
 echo -e "${C_INFO}[*]${RESET} Deploying to Cloud Run in ${REGION}..."
 gcloud run deploy "$SERVICE_NAME" \
     --image "$IMAGE" \
-    --region "$REGION" \
+    --platform managed \
+    --region us-central1 \
     --allow-unauthenticated \
     --port 8080 \
+    --cpu 2 \
+    --memory 4Gi \
     --cpu-boost \
+    --concurrency 1000 \
     --timeout 3600 \
+    --min-instances 1 \
+    --max-instances 1 \
     --no-cpu-throttling \
-    --min-instances 1
     --session-affinity \
     --quiet
 
 if [ $? -eq 0 ]; then
-    echo -e "DEPLOYMENT... > SUCCESSFUL! \033[K"
-    
-    # FETCH AND DEFINE HOST IMMEDIATELY
     SERVICE_URL=$(gcloud run services describe "$SERVICE_NAME" --region "$REGION" --format='value(status.url)' 2>/dev/null)
     CLEAN_HOST=$(echo "$SERVICE_URL" | sed 's|https://||')
-    
-    echo -e "\n--- PRIVATE ACCESS KEYS GENERATED ---"
-    COUNT=0
-    grep -o '"id": *"[^"]*"' config.json | cut -d'"' -f4 | while read -r KEY; do
-        COUNT=$((COUNT+1))
-        echo "USER SLOT $COUNT: vless://${KEY}@${CLEAN_HOST}:443?encryption=none&security=tls&type=ws&host=${CLEAN_HOST}&sni=${CLEAN_HOST}&path=%2Fprvtspyyy#PRIVATE_SLOT_${COUNT}"
-    done
+    echo -e "${C_SUCCESS}[✔]${RESET} Deployment complete"
 else
-    echo -e "DEPLOYMENT FAILED. Check Cloud Console."
+    echo -e "${C_ERROR}[✘]${RESET} Deployment failed. Check the error message above."
     exit 1
 fi
 
