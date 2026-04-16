@@ -1,12 +1,8 @@
 {
   "log": { "loglevel": "none" },
   "dns": {
-    "servers": [
-      "https+local://dns.google/dns-query",
-      "https+local://cloudflare-dns.com/dns-query",
-      "1.1.1.1",
-      "8.8.8.8"
-    ]
+    "hosts": { "geosite:category-ads-all": "127.0.0.1" },
+    "servers": ["1.1.1.1", "8.8.8.8", "localhost"]
   },
   "inbounds": [
     {
@@ -30,7 +26,9 @@
       },
       "streamSettings": {
         "network": "ws",
-        "wsSettings": { "path": "/prvtspyyy" }
+        "wsSettings": { 
+          "path": "/prvtspyyy"
+        }
       },
       "sniffing": { "enabled": true, "destOverride": ["http", "tls", "quic"] }
     },
@@ -41,8 +39,8 @@
       "settings": {
         "response": {
           "status": 200,
-          "headers": { "Content-Type": ["text/html"] },
-          "body": "<html><body>PRIVATE SERVER: Prvtspyyy404</body></html>"
+          "headers": { "Content-Type": ["text/plain"] },
+          "body": "Keep-Alive Active"
         }
       }
     }
@@ -57,88 +55,7 @@
       {
         "type": "field",
         "outboundTag": "block",
-        "domain": [
-          "geosite:category-ads-all",
-          "doubleclick.net",
-          "googleadservices.com",
-          "googlesyndication.com",
-          "adservice.google.com",
-          "pagead2.googlesyndication.com",
-          "tpc.googlesyndication.com",
-          "partner.googleadservices.com",
-          "www.googletagmanager.com",
-          "www.googletagservices.com",
-          "ads.youtube.com",
-          "ad.youtube.com",
-          "imasdk.googleapis.com",
-          "an.facebook.com",
-          "connect.facebook.net",
-          "staticxx.facebook.com",
-          "ads.twitter.com",
-          "analytics.twitter.com",
-          "ads-twitter.com",
-          "advertising.apple.com",
-          "iadsdk.apple.com",
-          "ads.tiktok.com",
-          "analytics.tiktok.com",
-          "mon.tiktok.com",
-          "log.tiktok.com",
-          "snap-ads.snapchat.com",
-          "ads.snapchat.com",
-          "sc-analytics.appspot.com",
-          "ads.linkedin.com",
-          "px.ads.linkedin.com",
-          "ads.reddit.com",
-          "rp.reddit.com",
-          "pixel.reddit.com",
-          "c2.taboola.com",
-          "trc.taboola.com",
-          "outbrain.com",
-          "widgets.outbrain.com",
-          "criteo.com",
-          "rtax.criteo.com",
-          "static.criteo.net",
-          "amazon-adsystem.com",
-          "s.amazon-adsystem.com",
-          "ads.yahoo.com",
-          "analytics.yahoo.com",
-          "secure.adnxs.com",
-          "ib.adnxs.com",
-          "scorecardresearch.com",
-          "pixel.quantserve.com",
-          "pubads.g.doubleclick.net",
-          "securepubads.g.doubleclick.net",
-          "adform.net",
-          "media.net",
-          "contextual.media.net",
-          "rubiconproject.com",
-          "openx.net",
-          "pubmatic.com",
-          "ads.pubmatic.com",
-          "springserve.com",
-          "advertising.com",
-          "mathtag.com",
-          "moatads.com",
-          "sharethis.com",
-          "addthis.com",
-          "hotjar.com",
-          "static.hotjar.com",
-          "script.hotjar.com",
-          "api.mixpanel.com",
-          "api.segment.io",
-          "cdn.segment.com",
-          "api.amplitude.com",
-          "cdn.amplitude.com",
-          "intercom.io",
-          "chartbeat.com",
-          "ping.chartbeat.net",
-          "2mdn.net"
-        ]
-      },
-      {
-        "type": "field",
-        "outboundTag": "direct",
-        "network": "udp,tcp"
+        "domain": ["geosite:category-ads-all"]
       }
     ]
   }
