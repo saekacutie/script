@@ -1,14 +1,14 @@
 FROM teddysun/xray:latest
 
-# Set working directory
+# Ensure correct workspace
 WORKDIR /etc/xray
 
-# Copy your local files into the image
+# Copy your configuration and startup script
 COPY config.json /etc/xray/config.json
 COPY entrypoint.sh /entrypoint.sh
 
-# Fix permissions
+# Fix permissions for the startup script
 RUN chmod +x /entrypoint.sh
 
-# Launch using the shell script
+# Run as a background-ready service
 ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
