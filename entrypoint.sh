@@ -1,16 +1,13 @@
 #!/bin/sh
 
-# Set the port from the environment variable (GCP requirement)
-# Default to 8080 if not provided
+# Use 8080 if $PORT is not set by the provider
 TARGET_PORT=${PORT:-8080}
 
-echo "Configuring Xray on Port: $TARGET_PORT"
+# Replace the port in the config
+# We use a very specific pattern to avoid breaking the JSON
+sed -i "s/\"port\": 8080/\"port\": $TARGET_PORT/g" /etc/xray/config.json
 
-# Dynamically replace 8080 in the config file
-sed -i "s/8080/$TARGET_PORT/g" /etc/xray/config.json
+echo "Container starting on port $TARGET_PORT"
 
-echo "Starting Xray Core with Full Ad-Block..."
-
-# 'exec' is vital. It keeps the process in the foreground
-# Keep this line in entrypoint.sh - it is correct for 24/7 operation
+# Use 'exec' to make Xray PID 1 (prevents crashes/zombies)
 exec /usr/bin/xray run -c /etc/xray/config.json
