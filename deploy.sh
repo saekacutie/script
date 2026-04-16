@@ -206,13 +206,9 @@ gcloud run deploy "$SERVICE_NAME" \
     --port 8080 \
     --cpu 2 \
     --memory 4Gi \
-    --cpu-boost \
-    --concurrency 1000 \
-    --timeout 3600 \
     --min-instances 1 \
-    --max-instances 1 \
+    --cpu-boost \
     --no-cpu-throttling \
-    --session-affinity \
     --quiet
 
 if [ $? -eq 0 ]; then
