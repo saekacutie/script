@@ -9,7 +9,7 @@
       "port": 8080,
       "protocol": "vless",
       "settings": {
-        "clients": [{ "id": "TOKEN_AUTH-Prvtspyyy-0000-0000-288102279599" }],
+        "clients": [{ "id": "9e507b33-65b6-40a4-b37f-eabad158b645" }],
         "decryption": "none",
         "fallbacks": [{ "dest": 8081 }]
       },
