@@ -36,8 +36,14 @@
       },
       "streamSettings": {
         "network": "ws",
+        "security": "none",
         "wsSettings": {
           "path": "/prvtspyyy"
+        },
+        "sockopt": {
+          "tcpKeepAliveInterval": 5,
+          "tcpKeepAliveIdle": 15,
+          "mark": 0
         }
       },
       "sniffing": {
@@ -63,7 +69,10 @@
   "outbounds": [
     {
       "protocol": "freedom",
-      "tag": "direct"
+      "tag": "direct",
+      "settings": {
+        "domainStrategy": "UseIP"
+      }
     },
     {
       "protocol": "blackhole",
