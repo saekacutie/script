@@ -1,25 +1,48 @@
 {
-  "log": { "loglevel": "none" },
+  "log": {
+    "loglevel": "warning"
+  },
   "dns": {
-    "hosts": { "geosite:category-ads-all": "127.0.0.1" },
-    "servers": ["1.1.1.1", "8.8.8.8", "localhost"]
+    "hosts": {
+      "geosite:category-ads-all": "127.0.0.1",
+      "geosite:google-ads": "127.0.0.1",
+      "domain:ads.youtube.com": "127.0.0.1",
+      "domain:doubleclick.net": "127.0.0.1",
+      "domain:adservice.google.com": "127.0.0.1"
+    },
+    "servers": [
+      "1.1.1.1",
+      "8.8.8.8",
+      "localhost"
+    ]
   },
   "inbounds": [
     {
       "port": 8080,
       "protocol": "vless",
       "settings": {
-        "clients": [{ "id": "9e507b33-65b6-40a4-b37f-eabad158b645" }],
+        "clients": [
+          {
+            "id": "9e507b33-65b6-40a4-b37f-eabad158b645"
+          }
+        ],
         "decryption": "none",
-        "fallbacks": [{ "dest": 8081 }]
+        "fallbacks": [
+          {
+            "dest": 8081
+          }
+        ]
       },
       "streamSettings": {
         "network": "ws",
-        "wsSettings": { 
+        "wsSettings": {
           "path": "/prvtspyyy"
         }
       },
-      "sniffing": { "enabled": true, "destOverride": ["http", "tls", "quic"] }
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls", "quic"]
+      }
     },
     {
       "listen": "127.0.0.1",
@@ -28,23 +51,47 @@
       "settings": {
         "response": {
           "status": 200,
-          "headers": { "Content-Type": ["text/plain"] },
+          "headers": {
+            "Content-Type": ["text/plain"]
+          },
           "body": "Keep-Alive Active"
         }
       }
     }
   ],
   "outbounds": [
-    { "protocol": "freedom", "tag": "direct" },
-    { "protocol": "blackhole", "tag": "block" }
+    {
+      "protocol": "freedom",
+      "tag": "direct"
+    },
+    {
+      "protocol": "blackhole",
+      "tag": "block"
+    }
   ],
   "routing": {
-    "domainStrategy": "IPIfNonMatch",
+    "domainStrategy": "IPOnDemand",
     "rules": [
       {
         "type": "field",
         "outboundTag": "block",
-        "domain": ["geosite:category-ads-all"]
+        "domain": [
+          "geosite:category-ads-all",
+          "geosite:category-ads",
+          "geosite:google-ads",
+          "geosite:facebook",
+          "domain:ads.youtube.com",
+          "domain:adservice.google.com",
+          "domain:doubleclick.net",
+          "domain:googlesyndication.com",
+          "domain:googleadservices.com",
+          "domain:analytics.google.com"
+        ]
+      },
+      {
+        "type": "field",
+        "outboundTag": "direct",
+        "network": "tcp,udp"
       }
     ]
   }
