@@ -48,7 +48,11 @@
     {
       "listen": "127.0.0.1",
       "port": 8081,
-      "protocol": "http",
+      "protocol": "dokodemo-door",
+      "address": "127.0.0.1",
+      "followRedirect": false
+      }
+    }
       "settings": {
         "response": {
           "status": 200,
