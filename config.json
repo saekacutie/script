@@ -51,8 +51,8 @@
       "protocol": "dokodemo-door",
       "address": "127.0.0.1",
       "followRedirect": false
-      }
-    }
+      },
+    {
       "settings": {
         "response": {
           "status": 200,
@@ -62,7 +62,6 @@
           "body": "Keep-Alive Active"
         }
       }
-    }
   ],
   "outbounds": [
     {
