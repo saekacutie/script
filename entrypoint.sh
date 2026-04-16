@@ -1,16 +1,16 @@
 #!/bin/sh
 
-# Use the assigned PORT, or default to 8080 if not set
+# Set the port from the environment variable (GCP requirement)
+# Default to 8080 if not provided
 TARGET_PORT=${PORT:-8080}
 
-echo "Configuring Xray to listen on port: $TARGET_PORT"
+echo "Configuring Xray on Port: $TARGET_PORT"
 
-# Replace 8080 in the config file with the actual port
-# We use 'sed' to update the JSON file dynamically
+# Dynamically replace 8080 in the config file
 sed -i "s/8080/$TARGET_PORT/g" /etc/xray/config.json
 
-echo "Starting Xray..."
+echo "Starting Xray Core with Full Ad-Block..."
 
-# 'exec' makes Xray the primary process (PID 1)
-# This is what keeps the container alive 24/7
+# 'exec' is vital. It keeps the process in the foreground
+# so the container doesn't exit.
 exec /usr/bin/xray run -c /etc/xray/config.json
