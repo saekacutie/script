@@ -206,7 +206,7 @@ gcloud run deploy "$SERVICE_NAME" \
     --port 8080 \
     --cpu 2 \
     --memory 4Gi \
-    --cpu-boost \
+    --startup-cpu-boost \
     --concurrency 1000 \
     --timeout 3600 \
     --min-instances 1 \
@@ -224,7 +224,7 @@ else
     exit 1
 fi
 
-# --- URI Generation (Now CLEAN_HOST is actually defined) ---
+# --- URI Generation ---
 VLESS_URI="vless://${UUID}@${CLEAN_HOST}:443?encryption=none&security=tls&type=ws&path=%2F${WS_PATH#/}&host=${CLEAN_HOST}&sni=${CLEAN_HOST}&fp=chrome#${SERVICE_NAME}"
 echo ""
 echo -e "${C_SUCCESS}╔════════════════════════════════════════════════════════════════════════════╗${RESET}"
