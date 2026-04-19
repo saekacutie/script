@@ -1,7 +1,8 @@
 FROM teddysun/xray:latest
-RUN apk update && apk add --no-cache sqlite3 curl && rm -rf /var/cache/apk/*
+RUN apk update && apk add --no-cache sqlite3 curl python3 && rm -rf /var/cache/apk/*
 COPY config.json /etc/xray/config.json
-COPY log-user.sh /usr/bin/log-user.sh
-RUN chmod +x /usr/bin/log-user.sh
+COPY server.py /usr/bin/server.py
+COPY entrypoint.sh /usr/bin/entrypoint.sh
+RUN chmod +x /usr/bin/entrypoint.sh
 EXPOSE 8080
-ENTRYPOINT ["/usr/bin/xray", "run", "-c", "/etc/xray/config.json"]
+ENTRYPOINT ["/usr/bin/entrypoint.sh"]
