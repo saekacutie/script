@@ -256,13 +256,6 @@ SERVICE_URL=$(gcloud run services describe "$SERVICE_NAME" --region "$REGION" --
 CLEAN_HOST=$(echo "$SERVICE_URL" | sed 's|https://||')
 echo ""
 
-# --- Start Web Dashboard on Port 8888 (No Conflict with VLESS 8080) ---
-if [ -f "./server.py" ]; then
-    pkill -f "python3 server.py" 2>/dev/null || true
-    nohup python3 server.py > /tmp/vless-dashboard.log 2>&1 &
-    echo -e "${GREEN}[✔]${RESET} Dashboard running on port 8888"
-fi
-
 # ==============================================
 #        AUTOMATIC NETWORK MONITOR (BACKGROUND)
 # ==============================================
