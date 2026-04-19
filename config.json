@@ -1,9 +1,5 @@
 {
-  "log": { "loglevel": "none" },
-  "dns": {
-    "hosts": { "geosite:category-ads-all": "127.0.0.1" },
-    "servers": ["1.1.1.1", "8.8.8.8", "localhost"]
-  },
+  "log": { "loglevel": "warning" },
   "inbounds": [
     {
       "port": 8080,
@@ -17,19 +13,6 @@
         "network": "ws",
         "wsSettings": { 
           "path": "/prvtspyyy"
-        }
-      },
-      "sniffing": { "enabled": true, "destOverride": ["http", "tls", "quic"] }
-    },
-    {
-      "listen": "127.0.0.1",
-      "port": 8081,
-      "protocol": "http",
-      "settings": {
-        "response": {
-          "status": 200,
-          "headers": { "Content-Type": ["text/plain"] },
-          "body": "Keep-Alive Active"
         }
       }
     }
@@ -50,7 +33,9 @@
     ]
   },
   "outbounds": [
-    { "protocol": "freedom", "tag": "direct" },
-    { "protocol": "blackhole", "tag": "block" }
+    { "protocol": "freedom",
+      "tag": "direct" },
+    { "protocol": "blackhole",
+      "tag": "block" }
   ]
 }
