@@ -3,7 +3,7 @@
   "inbounds": [
     {
       "listen": "0.0.0.0",
-      "port": 8080,
+      "port": 8080, 
       "protocol": "vless",
       "settings": {
         "clients": [ { "id": "9e507b33-65b6-40a4-b37f-eabad158b645" } ],
@@ -14,18 +14,14 @@
         "security": "none",
         "wsSettings": { "path": "/prvtspyyy" },
         "sockopt": { "tcpFastOpen": true }
-      },
-      "sniffing": { "enabled": true, "destOverride": ["http", "tls", "quic"] }
+      }
     }
   ],
   "outbounds": [
     {
       "protocol": "freedom",
       "tag": "direct",
-      "settings": { "domainStrategy": "UseIPv4" },
-      "streamSettings": { "sockopt": { "tcpFastOpen": true } }
+      "settings": { "domainStrategy": "UseIPv4" }
     }
-  ],
-  "transport": { "maxBufferSize": 10485760, "maxStreamBufferSize": 5242880 },
-  "mux": { "enabled": true, "concurrency": 16 }
+  ]
 }
