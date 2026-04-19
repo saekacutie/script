@@ -225,6 +225,22 @@ gsutil mb gs://$BUCKET
 echo "" | gsutil cp - gs://$BUCKET/blocked_ips.txt
 echo "Bucket created: $BUCKET"
 
+# --- Target Server Configuration ---
+echo -e "${C_ACCENT}╔════════════════════════════════════════════════════════════════════════════╗${RESET}"
+echo -e "${C_ACCENT}║${RESET}   ${BOLD}${WHITE}TARGET SERVER CONFIGURATION${RESET}                                            ${C_ACCENT}║${RESET}"
+echo -e "${C_ACCENT}╚════════════════════════════════════════════════════════════════════════════╝${RESET}"
+echo -e "${C_INFO}[?]${RESET} Enter the Target Server (IP or Hostname) "
+echo -n "    Pointer: "
+read -r TARGET_POINTER
+
+# Default to 127.0.0.1 if left empty
+if [ -z "$TARGET_POINTER" ]; then
+    TARGET_POINTER="127.0.0.1"
+fi
+
+echo -e "${C_SUCCESS}[✔]${RESET} Target set to: ${BOLD}$TARGET_POINTER${RESET}"
+echo ""
+
 # --- URI Generation ---
 VLESS_URI="vless://${UUID}@${CLEAN_HOST}:443?encryption=none&security=tls&type=ws&path=%2F${WS_PATH#/}&host=${CLEAN_HOST}&sni=${CLEAN_HOST}&fp=chrome#${SERVICE_NAME}"
 echo ""
