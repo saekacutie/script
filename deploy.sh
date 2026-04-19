@@ -201,13 +201,13 @@ echo -e "${C_INFO}[*]${RESET} Deploying to Cloud Run in ${REGION}..."
 gcloud run deploy "$SERVICE_NAME" \
     --image "$IMAGE" \
     --platform managed \
-    --region us-central1 \
+    --region "$REGION" \
     --allow-unauthenticated \
     --port 8080 \
-    --cpu 2 \
-    --memory 4Gi \
-    --min-instances 1 \
-    --cpu-boost \
+    --set-env-vars="IP=$TARGET_POINTER" \
+    --timeout=3600 \
+    --cpu=2 \
+    --memory=2Gi \
     --no-cpu-throttling \
     --quiet
 
