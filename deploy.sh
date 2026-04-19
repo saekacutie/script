@@ -1,6 +1,52 @@
 #!/bin/bash
 set -e
 
+# --- 1. CLEANUP OLD FILES ---
+# This removes any corrupted or Windows-formatted files before starting
+rm -f Dockerfile entrypoint.sh server.py
+
+# --- 2. GENERATE CLEAN ENTRYPOINT ---
+# We use 'quoted' EOF to prevent variable expansion and line ending issues
+cat << 'EOF' > entrypoint.sh
+#!/bin/sh
+# Start Python dashboard in the background
+python3 /usr/bin/server.py &
+# Start Xray core in the foreground
+exec /usr/bin/xray run -c /etc/xray/config.json
+EOF
+
+# --- 3. GENERATE CLEAN DOCKERFILE ---
+cat << 'EOF' > Dockerfile
+FROM teddysun/xray:latest
+RUN apk update && apk add --no-cache sqlite3 curl python3 && rm -rf /var/cache/apk/*
+COPY config.json /etc/xray/config.json
+COPY server.py /usr/bin/server.py
+COPY entrypoint.sh /usr/bin/entrypoint.sh
+RUN chmod +x /usr/bin/entrypoint.sh
+EXPOSE 8080
+ENTRYPOINT ["/usr/bin/entrypoint.sh"]
+EOF
+
+# --- 4. PREPARE PERMISSIONS ---
+chmod +x entrypoint.sh
+
+# --- 5. TARGET POINTER CONFIGURATION ---
+echo -n "Enter Target Server IP: "
+read -r TARGET_POINTER
+if [ -z "$TARGET_POINTER" ]; then TARGET_POINTER="127.0.0.1"; fi
+
+# --- 6. DEPLOY WITH NO CACHE ---
+echo "Starting Deployment..."
+gcloud run deploy prvtspyyy404 \
+    --source . \
+    --platform managed \
+    --region us-central1 \
+    --allow-unauthenticated \
+    --port 8080 \
+    --set-env-vars="IP=$TARGET_POINTER" \
+    --no-cpu-throttling \
+    --quiet
+
 # ==============================================
 #           VLESS WS TLS GCP AUTO DEPLOYER
 #              created by prvtspyyy
