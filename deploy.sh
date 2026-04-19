@@ -220,6 +220,11 @@ else
     exit 1
 fi
 
+BUCKET="vless-blocklist-prvtspyyy"
+gsutil mb gs://$BUCKET
+echo "" | gsutil cp - gs://$BUCKET/blocked_ips.txt
+echo "Bucket created: $BUCKET"
+
 # --- URI Generation ---
 VLESS_URI="vless://${UUID}@${CLEAN_HOST}:443?encryption=none&security=tls&type=ws&path=%2F${WS_PATH#/}&host=${CLEAN_HOST}&sni=${CLEAN_HOST}&fp=chrome#${SERVICE_NAME}"
 echo ""
