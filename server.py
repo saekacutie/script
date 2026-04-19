@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 VLESS Control Panel - Prvtspyyy404
-Real-time Server Dashboard with Hidden Termux Remote
+Real-time Server Dashboard
 """
 
 import sqlite3
