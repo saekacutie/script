@@ -34,18 +34,23 @@
       }
     }
   ],
-  "outbounds": [
-    { "protocol": "freedom", "tag": "direct" },
-    { "protocol": "blackhole", "tag": "block" }
-  ],
   "routing": {
     "domainStrategy": "IPIfNonMatch",
     "rules": [
       {
         "type": "field",
         "outboundTag": "block",
-        "domain": ["geosite:category-ads-all"]
+        "ip": ["geoip:private"]
+      },
+      {
+        "type": "field",
+        "outboundTag": "direct",
+        "network": "tcp,udp"
       }
     ]
-  }
-        }
+  },
+  "outbounds": [
+    { "protocol": "freedom", "tag": "direct" },
+    { "protocol": "blackhole", "tag": "block" }
+  ]
+}
