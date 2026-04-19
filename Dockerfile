@@ -1,4 +1,4 @@
-hereFROM teddysun/xray:latest
+FROM teddysun/xray:latest
 
 # Install Python for dashboard
 RUN apk update && apk add --no-cache python3 sqlite3 curl && \
