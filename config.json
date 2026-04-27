@@ -1,41 +1,47 @@
 {
-  "log": { "loglevel": "warning" },
+  "log": { "loglevel": "none" },
   "inbounds": [
     {
       "port": 8080,
       "protocol": "vless",
       "settings": {
-        "clients": [{ "id": "9e507b33-65b6-40a4-b37f-eabad158b645" }],
+        "clients": [
+          { "id": "9e507b33-65b6-40a4-b37f-eabad158b645" }
+        ],
         "decryption": "none",
-        "fallbacks": [{ "dest": 8081 }]
+        "fallbacks": [
+          { "dest": 8081 }
+        ]
       },
       "streamSettings": {
         "network": "ws",
-        "wsSettings": { 
+        "security": "none",
+        "wsSettings": {
           "path": "/prvtspyyy"
+        }
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls"]
+      }
+    },
+    {
+      "listen": "127.0.0.1",
+      "port": 8081,
+      "protocol": "http",
+      "settings": {
+        "response": {
+          "status": 200,
+          "headers": { "Content-Type": ["text/plain"] },
+          "body": "Prvtspyyy404"
         }
       }
     }
   ],
-  "routing": {
-    "domainStrategy": "IPIfNonMatch",
-    "rules": [
-      {
-        "type": "field",
-        "outboundTag": "block",
-        "ip": ["geoip:private"]
-      },
-      {
-        "type": "field",
-        "outboundTag": "direct",
-        "network": "tcp,udp"
-      }
-    ]
-  },
   "outbounds": [
-    { "protocol": "freedom",
-      "tag": "direct" },
-    { "protocol": "blackhole",
-      "tag": "block" }
+    {
+      "protocol": "freedom",
+      "settings": { "domainStrategy": "UseIPv4" }
+    }
   ]
 }
