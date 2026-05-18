@@ -10,38 +10,36 @@
         ],
         "decryption": "none",
         "fallbacks": [
-          { "dest": 8081 }
+          {
+            "dest": 8081,
+            "xver": 0
+          }
         ]
       },
       "streamSettings": {
         "network": "ws",
         "security": "none",
         "wsSettings": {
-          "path": "/prvtspyyy"
+          "path": "/prvtspyyy",
+          "headers": {
+            "Host": "www.gstatic.com"
+          }
         }
       },
       "sniffing": {
         "enabled": true,
-        "destOverride": ["http", "tls"]
-      }
-    },
-    {
-      "listen": "127.0.0.1",
-      "port": 8081,
-      "protocol": "http",
-      "settings": {
-        "response": {
-          "status": 200,
-          "headers": { "Content-Type": ["text/plain"] },
-          "body": "Prvtspyyy404"
-        }
+        "destOverride": ["http", "tls"],
+        "metadataOnly": false
       }
     }
   ],
   "outbounds": [
     {
       "protocol": "freedom",
-      "settings": { "domainStrategy": "UseIPv4" }
+      "settings": {
+        "domainStrategy": "UseIPv4"
+      },
+      "tag": "direct"
     }
   ]
 }

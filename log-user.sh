@@ -1,15 +1,17 @@
-here#!/bin/sh
-# User logging script - called by Xray on connection
-DB="/data/vless_users.db"
+#!/bin/sh
+# Log user connections to SQLite database
+DB="/tmp/vless_users.db"
 
-# Initialize database
-sqlite3 "$DB" "CREATE TABLE IF NOT EXISTS connections (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    source_ip TEXT UNIQUE,
-    connected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_blocked BOOLEAN DEFAULT 0
-);" 2>/dev/null
+# Initialize database if not exists
+if [ ! -f "$DB" ]; then
+    sqlite3 "$DB" "CREATE TABLE IF NOT EXISTS connections (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        source_ip TEXT UNIQUE,
+        connected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        is_blocked BOOLEAN DEFAULT 0
+    );" 2>/dev/null
+fi
 
 # Log connection (IP passed as argument)
 if [ -n "$1" ]; then

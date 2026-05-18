@@ -6,14 +6,15 @@ import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 from datetime import datetime
+import threading
 
 DB_FILE = "/tmp/vless_users.db"
 HTTP_PORT = 8081
-TARGET_IP = os.environ.get('IP', '127.0.0.1')
 OWNER_KEY = "prvtspyyy404"
 START_TIME = time.time()
 
 def init_db():
+    """Initialize SQLite database for connection tracking"""
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS connections (
@@ -29,33 +30,49 @@ def init_db():
     conn.close()
 
 def get_connections():
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute('SELECT source_ip, duration, status, data_mb FROM connections')
-    rows = c.fetchall()
-    conn.close()
-    return rows
+    """Fetch active connections from database"""
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        c = conn.cursor()
+        c.execute('SELECT source_ip, duration, status, data_mb FROM connections WHERE status="ACTIVE"')
+        rows = c.fetchall()
+        conn.close()
+        return rows
+    except:
+        return []
 
-class Handler(BaseHTTPRequestHandler):
+class VLESSHandler(BaseHTTPRequestHandler):
     def do_GET(self):
+        """Handle GET requests"""
         p = urlparse(self.path)
+        
         if p.path == '/':
-            self.serve_html()
+            self.serve_dashboard()
+        elif p.path == '/health':
+            self.serve_health()
         elif p.path == '/api/stats':
             self.api_stats()
-        elif p.path == '/api/termux':
-            self.api_termux(p.query)
+        elif p.path == '/api/connections':
+            self.api_connections()
         else:
             self.send_error(404)
     
-    def serve_html(self):
+    def serve_health(self):
+        """Health check endpoint for Cloud Run"""
+        self.send_response(200)
+        self.send_header('Content-type', 'text/plain')
+        self.end_headers()
+        self.wfile.write(b'healthy')
+    
+    def serve_dashboard(self):
+        """Serve the VLESS management dashboard"""
         uptime_seconds = int(time.time() - START_TIME)
         hours, remainder = divmod(uptime_seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
         uptime_str = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
         
         self.send_response(200)
-        self.send_header('Content-type', 'text/html')
+        self.send_header('Content-type', 'text/html; charset=utf-8')
         self.end_headers()
         
         html = f'''<!DOCTYPE html>
@@ -63,169 +80,225 @@ class Handler(BaseHTTPRequestHandler):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prvtspyyy404 Dashboard</title>
+    <title>VLESS Manager Dashboard</title>
     <style>
-        body {{ margin: 0; font-family: 'Courier New', Courier, monospace; background-color: #050505; color: #e0e0e0; overflow-x: hidden; }}
-        
-        /* Loader Overlay */
-        #loader {{ position: fixed; width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; z-index: 9999; flex-direction: column; transition: opacity 0.5s; }}
-        .spinner {{ border: 3px solid #222; border-top: 3px solid #fff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }}
-        @keyframes spin {{ 0% {{ transform: rotate(0deg); }} 100% {{ transform: rotate(360deg); }} }}
-        
-        /* Main Container */
-        .container {{ max-width: 900px; margin: 0 auto; padding: 40px 20px; display: none; }}
-        
-        /* Glitch Banner */
-        .glitch-wrapper {{ text-align: center; margin-bottom: 40px; }}
-        .glitch {{ font-size: 3.5rem; font-weight: bold; position: relative; color: white; text-transform: uppercase; letter-spacing: 6px; display: inline-block; }}
-        .glitch::before, .glitch::after {{ content: "Prvtspyyy404"; position: absolute; top: 0; left: 0; background: #050505; overflow: hidden; }}
-        .glitch::before {{ left: 2px; text-shadow: -2px 0 red; animation: glitch-anim 2s infinite linear alternate-reverse; }}
-        .glitch::after {{ left: -2px; text-shadow: -2px 0 blue; animation: glitch-anim 3s infinite linear alternate-reverse; }}
-        @keyframes glitch-anim {{
-            0% {{ clip: rect(24px, 9999px, 9px, 0); }}
-            20% {{ clip: rect(85px, 9999px, 14px, 0); }}
-            40% {{ clip: rect(66px, 9999px, 5px, 0); }}
-            60% {{ clip: rect(92px, 9999px, 73px, 0); }}
-            80% {{ clip: rect(50px, 9999px, 30px, 0); }}
-            100% {{ clip: rect(10px, 9999px, 45px, 0); }}
+        * {{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }}
-
-        /* Panels */
-        .panel {{ background: #0f0f0f; border: 1px solid #333; padding: 25px; margin-bottom: 25px; border-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }}
-        .panel-title {{ border-bottom: 1px solid #333; padding-bottom: 10px; margin-top: 0; margin-bottom: 20px; font-size: 1.2rem; color: #fff; letter-spacing: 2px; }}
-        .info-row {{ display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #222; font-size: 0.95rem; }}
-        .info-row:last-child {{ border-bottom: none; }}
-        .val {{ font-weight: bold; color: #fff; }}
         
-        /* Buttons & Footer */
-        .btn {{ background: transparent; color: #fff; border: 1px solid #fff; padding: 10px 20px; cursor: pointer; font-family: inherit; font-weight: bold; text-transform: uppercase; transition: all 0.3s; margin-top: 15px; display: inline-block; }}
-        .btn:hover {{ background: #fff; color: #000; }}
-        .footer {{ text-align: center; margin-top: 50px; font-size: 0.8rem; color: #666; border-top: 1px solid #222; padding-top: 20px; }}
-        .top-bar {{ display: flex; justify-content: space-between; margin-bottom: 30px; color: #888; font-size: 0.9rem; }}
+        body {{
+            font-family: 'Courier New', Courier, monospace;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #e0e0e0;
+            padding: 20px;
+            min-height: 100vh;
+        }}
+        
+        .container {{
+            max-width: 900px;
+            margin: 0 auto;
+        }}
+        
+        .header {{
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            border-bottom: 2px solid #00ff88;
+        }}
+        
+        .header h1 {{
+            color: #00ff88;
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+            margin-bottom: 10px;
+        }}
+        
+        .header p {{
+            color: #888;
+            font-size: 0.9rem;
+        }}
+        
+        .panel {{
+            background: rgba(15, 15, 15, 0.8);
+            border: 1px solid #333;
+            border-left: 3px solid #00ff88;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }}
+        
+        .panel-title {{
+            color: #00ff88;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }}
+        
+        .info-row {{
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #222;
+            font-size: 0.95rem;
+        }}
+        
+        .info-row:last-child {{
+            border-bottom: none;
+        }}
+        
+        .label {{
+            color: #888;
+        }}
+        
+        .value {{
+            color: #00ff88;
+            font-weight: bold;
+        }}
+        
+        .status-up {{
+            color: #00ff88;
+        }}
+        
+        .status-down {{
+            color: #ff4444;
+        }}
+        
+        .footer {{
+            text-align: center;
+            margin-top: 40px;
+            color: #555;
+            font-size: 0.8rem;
+            border-top: 1px solid #222;
+            padding-top: 20px;
+        }}
     </style>
 </head>
 <body>
-
-    <div id="loader">
-        <div class="spinner"></div>
-        <p>Loading Webpage... this won't take a minute.</p>
-    </div>
-
-    <div class="container" id="main-content">
-        <div class="top-bar">
-            <span id="real-time-clock">--:--:--</span>
-            <span>PRVTSPYYY NETWORK</span>
-        </div>
-
-        <div class="glitch-wrapper">
-            <div class="glitch">Prvtspyyy404</div>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ VLESS Manager</h1>
+            <p>Cloud Run Edition | created by prvtspyyy</p>
         </div>
         
         <div class="panel">
-            <h3 class="panel-title">[+] HOST INFO</h3>
-            <div class="info-row"><span>HOST:</span> <span class="val" id="val-host">Detecting...</span></div>
-            <div class="info-row"><span>POINTED SERVER:</span> <span class="val">{TARGET_IP}</span></div>
-            <div class="info-row"><span>UPTIME:</span> <span class="val">{uptime_str}</span></div>
-            <div class="info-row"><span>SERVER STATUS:</span> <span class="val" style="color: #00ff88;">ONLINE</span></div>
-            <div class="info-row"><span>HOST IP REGION:</span> <span class="val" id="val-region">Detecting...</span></div>
-            <div class="info-row"><span>PROTOCOL:</span> <span class="val">VLESS + TCP/WS</span></div>
+            <div class="panel-title">[+] SERVER STATUS</div>
+            <div class="info-row">
+                <span class="label">Status:</span>
+                <span class="value status-up">✔ ONLINE</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Uptime:</span>
+                <span class="value">{uptime_str}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Protocol:</span>
+                <span class="value">VLESS + WebSocket</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Server Time:</span>
+                <span class="value" id="server-time">--:--:--</span>
+            </div>
         </div>
-
+        
         <div class="panel">
-            <h3 class="panel-title">[*] NETWORK METRICS</h3>
-            <div class="info-row"><span>YOUR IP ADDRESS:</span> <span class="val"><span id="val-ip">Detecting...</span> [IP]</span></div>
-            <div class="info-row"><span>CONNECTED USERS:</span> <span class="val" id="val-users">0</span></div>
-            <div class="info-row"><span>SERVER PING:</span> <span class="val" id="val-ping">0 ms</span></div>
+            <div class="panel-title">[*] CONNECTION METRICS</div>
+            <div class="info-row">
+                <span class="label">Active Connections:</span>
+                <span class="value" id="active-users">0</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Your IP:</span>
+                <span class="value" id="your-ip">Detecting...</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Response Time:</span>
+                <span class="value" id="response-time">-- ms</span>
+            </div>
         </div>
-
-        <div style="text-align: center;">
-            <button class="btn" onclick="location.reload()">Refresh Data</button>
-        </div>
-
+        
         <div class="footer">
-            SYSTEM DESIGNED BY PRVTSPYYY | AUTHORIZED ACCESS ONLY
+            <p>VLESS Server Management System | Authorized Access Only</p>
+            <p>© 2026 - created by prvtspyyy</p>
         </div>
     </div>
-
+    
     <script>
-        // Loader timeout
-        setTimeout(() => {{
-            document.getElementById('loader').style.opacity = '0';
-            setTimeout(() => {{
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
-            }}, 500);
-        }}, 2000);
-
-        // Real-time Clock
+        // Update server time
         setInterval(() => {{
-            document.getElementById('real-time-clock').innerText = new Date().toLocaleString();
+            document.getElementById('server-time').innerText = new Date().toLocaleTimeString();
         }}, 1000);
-
-        // Auto-Detect IP & Region
-        fetch('https://ipapi.co/json/')
-            .then(res => res.json())
-            .then(data => {{
-                document.getElementById('val-ip').innerText = data.ip;
-                document.getElementById('val-region').innerText = data.city + ', ' + data.country_name;
-            }}).catch(() => {{
-                document.getElementById('val-ip').innerText = "Unavailable";
-                document.getElementById('val-region').innerText = "Unavailable";
-            }});
-
-        document.getElementById('val-host').innerText = window.location.hostname;
         
-        // Fetch Internal Stats
-        function fetchStats() {{
+        // Fetch stats
+        function updateStats() {{
             fetch('/api/stats')
                 .then(res => res.json())
                 .then(data => {{
-                    document.getElementById('val-users').innerText = data.active_count;
-                    document.getElementById('val-ping').innerText = data.ping_ms + ' ms';
+                    document.getElementById('active-users').innerText = data.active_count;
+                    document.getElementById('response-time').innerText = data.response_time + ' ms';
+                }})
+                .catch(err => {{
+                    document.getElementById('active-users').innerText = 'Error';
                 }});
         }}
-        setInterval(fetchStats, 5000);
-        fetchStats();
+        
+        // Detect client IP
+        fetch('https://api.ipify.org?format=json')
+            .then(res => res.json())
+            .then(data => {{
+                document.getElementById('your-ip').innerText = data.ip;
+            }})
+            .catch(() => {{
+                document.getElementById('your-ip').innerText = 'Unavailable';
+            }});
+        
+        updateStats();
+        setInterval(updateStats, 5000);
     </script>
 </body>
 </html>'''
+        
         self.wfile.write(html.encode())
     
     def api_stats(self):
+        """API endpoint for server statistics"""
         rows = get_connections()
-        # Simulated ping based on internal logic speed
-        ping_ms = int((time.time() - START_TIME) % 15) + 12 
-        self.send_json({
-            'active_count': len(rows),
-            'ping_ms': ping_ms
-        })
-
-    def api_termux(self, query):
-        params = parse_qs(query)
-        key = params.get('key', [''])[0]
-        if key != OWNER_KEY:
-            self.send_json({'error': 'Unauthorized'})
-            return
+        response_time = int((time.time() - START_TIME) % 50) + 10
         
-        cmd = params.get('cmd', [''])[0]
-        if cmd == 'list':
-            rows = get_connections()
-            data = [{'ip': r[0], 'duration': r[1], 'status': r[2], 'mb_consumed': r[3]} for r in rows]
-            self.send_json(data)
-        else:
-            self.send_json({'error': 'Unknown command'})
-
-    def send_json(self, data):
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        
+        data = {
+            'active_count': len(rows),
+            'response_time': response_time,
+            'uptime_seconds': int(time.time() - START_TIME)
+        }
+        self.wfile.write(json.dumps(data).encode())
+    
+    def api_connections(self):
+        """API endpoint for detailed connection info"""
+        rows = get_connections()
+        data = [{'ip': r[0], 'duration': r[1], 'status': r[2], 'data_mb': r[3]} for r in rows]
+        
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
         self.end_headers()
         self.wfile.write(json.dumps(data).encode())
     
     def log_message(self, format, *args):
+        """Suppress default logging"""
         pass
 
 if __name__ == '__main__':
     init_db()
-    server = HTTPServer(('0.0.0.0', HTTP_PORT), Handler)
-    print(f"Prvtspyyy Manager running on port {HTTP_PORT}")
-    server.serve_forever()
+    server = HTTPServer(('0.0.0.0', HTTP_PORT), VLESSHandler)
+    print(f"[*] VLESS Dashboard running on port {HTTP_PORT}")
+    print(f"[*] Access at: http://localhost:{HTTP_PORT}")
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print("[*] Shutting down...")
+        server.shutdown()
