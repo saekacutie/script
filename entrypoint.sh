@@ -1,18 +1,28 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-# Replace port correctly
+# 1. Replace port FIRST
 sed -i "s/8080/$PORT/g" /etc/xray/config.json
+echo "[1] Port set to: $PORT"
 
-# Start IP manager
+# 2. Start dashboard FIRST, bind localhost only
+python3 /server.py --host 127.0.0.1 --port 8081 &
+sleep 1
+
+# 3. Start IP manager
 /ip-manager.sh start &
+sleep 1
 
-# Start dashboard ONLY on localhost (no conflict)
-python3 /server.py --port=8081 --host=127.0.0.1 &
+# 4. START XRAY — THIS MUST LISTEN NOW
+echo "[2] Starting Xray Core..."
+/usr/bin/xray run -c /etc/xray/config.json &
 
-# Wait for files ready
-sleep 2
+# 5. WAIT UNTIL PORT IS LISTENING — critical for Cloud Run
+echo "[3] Waiting for port $PORT to open..."
+until nc -z 127.0.0.1 $PORT; do
+  sleep 0.2
+done
+echo "[✅] SUCCESS: Listening on $PORT — Ready!"
 
-# Start Xray — bind ALL interfaces
-echo "Starting Xray on port: $PORT"
-/usr/bin/xray run -c /etc/xray/config.json
+# Keep container alive
+wait
