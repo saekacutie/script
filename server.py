@@ -3,14 +3,16 @@ import sqlite3
 import json
 import os
 import time
+import argparse
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 from datetime import datetime
 import threading
 
 DB_FILE = "/tmp/vless_users.db"
-IP_FILE = "/tmp/remote_ips.txt"  # Remote IP list file
+IP_FILE = "/tmp/remote_ips.txt"
 HTTP_PORT = 8081
+HTTP_HOST = "127.0.0.1"
 OWNER_KEY = "prvtspyyy404"
 START_TIME = time.time()
 
@@ -30,7 +32,6 @@ def init_db():
     conn.close()
 
 def update_ip_file():
-    """Update remote_ips.txt with all active IPs"""
     while True:
         try:
             conn = sqlite3.connect(DB_FILE)
@@ -39,13 +40,12 @@ def update_ip_file():
             ips = [row[0] for row in c.fetchall()]
             conn.close()
             
-            # Write clean IP list
             with open(IP_FILE, 'w') as f:
                 f.write(f"# VLESS+XHTTP Remote IPs - Updated: {datetime.now()}\n")
                 f.write(f"# Total Active: {len(ips)}\n\n")
                 f.write("\n".join(ips))
             
-            time.sleep(10)  # Refresh every 10s
+            time.sleep(10)
         except:
             time.sleep(5)
 
@@ -72,7 +72,7 @@ class VLESSHandler(BaseHTTPRequestHandler):
             self.api_stats()
         elif p.path == '/api/connections':
             self.api_connections()
-        elif p.path == '/remote_ips.txt':  # ✅ Direct access to IP list
+        elif p.path == '/remote_ips.txt':
             self.serve_ip_file()
         else:
             self.send_error(404)
@@ -84,7 +84,6 @@ class VLESSHandler(BaseHTTPRequestHandler):
         self.wfile.write(b'healthy')
     
     def serve_ip_file(self):
-        """Serve remote IP list file for Termux access"""
         if os.path.exists(IP_FILE):
             self.send_response(200)
             self.send_header('Content-Type', 'text/plain')
@@ -99,9 +98,11 @@ class VLESSHandler(BaseHTTPRequestHandler):
         hours, remainder = divmod(uptime_seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
         uptime_str = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+        
         self.send_response(200)
         self.send_header('Content-type', 'text/html; charset=utf-8')
         self.end_headers()
+        
         html = f'''<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -182,10 +183,17 @@ class VLESSHandler(BaseHTTPRequestHandler):
     def log_message(self, *args): pass
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--host', default='127.0.0.1')
+    parser.add_argument('--port', type=int, default=8081)
+    args = parser.parse_args()
+
     init_db()
-    # Start IP file updater thread
     threading.Thread(target=update_ip_file, daemon=True).start()
-    server = HTTPServer(('0.0.0.0', HTTP_PORT), VLESSHandler)
-    print(f"[*] Dashboard Active")
-    try: server.serve_forever()
-    except KeyboardInterrupt: server.shutdown()
+    
+    server = HTTPServer((args.host, args.port), VLESSHandler)
+    print(f"[*] Dashboard running on {args.host}:{args.port}")
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        server.shutdown()
