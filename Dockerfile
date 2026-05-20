@@ -1,6 +1,7 @@
 FROM teddysun/xray:latest
 
-RUN apk add --no-cache python3 sqlite curl
+# Added missing packages
+RUN apk add --no-cache python3 sqlite curl bash
 
 COPY config.json /etc/xray/config.json
 COPY entrypoint.sh /entrypoint.sh
@@ -15,5 +16,7 @@ RUN chmod +x /log-user.sh
 RUN chmod +x /network-monitor.sh
 RUN chmod +x /ip-manager.sh
 
+# EXPOSE correct port
 EXPOSE 8080
+
 ENTRYPOINT ["/entrypoint.sh"]
