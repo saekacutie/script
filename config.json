@@ -11,7 +11,8 @@
         ],
         "decryption": "none",
         "fallbacks": [
-          { "dest": "127.0.0.1:8081" }
+          { "path": "/prvtspyyy", "dest": "@xhttp" },
+          { "dest": "@dashboard" }
         ]
       },
       "streamSettings": {
@@ -33,22 +34,28 @@
       }
     },
     {
+      "tag": "xhttp",
+      "listen": "127.0.0.1",
+      "port": 8082,
+      "protocol": "vless",
+      "settings": { "clients": [], "decryption": "none" },
+      "streamSettings": { "network": "xhttp" }
+    },
+    {
+      "tag": "dashboard",
       "listen": "127.0.0.1",
       "port": 8081,
       "protocol": "http",
       "settings": {
         "response": {
           "status": 200,
-          "headers": { "Content-Type": ["text/plain"] },
+          "headers": { "Content-Type": ["text/plain", "text/html"] },
           "body": "Prvtspyyy404"
         }
       }
     }
   ],
   "outbounds": [
-    {
-      "protocol": "freedom",
-      "settings": { "domainStrategy": "UseIPv4" }
-    }
+    { "protocol": "freedom", "settings": { "domainStrategy": "UseIPv4" } }
   ]
 }
