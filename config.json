@@ -2,6 +2,7 @@
   "log": { "loglevel": "none" },
   "inbounds": [
     {
+      "listen": "0.0.0.0",
       "port": 8080,
       "protocol": "vless",
       "settings": {
@@ -10,7 +11,7 @@
         ],
         "decryption": "none",
         "fallbacks": [
-          { "dest": 8081 }
+          { "dest": "127.0.0.1:8081" }
         ]
       },
       "streamSettings": {
