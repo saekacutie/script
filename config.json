@@ -14,10 +14,16 @@
         ]
       },
       "streamSettings": {
-        "network": "ws",
+        "network": "xhttp",
         "security": "none",
-        "wsSettings": {
-          "path": "/prvtspyyy"
+        "xhttpSettings": {
+          "path": "/prvtspyyy",
+          "host": ["*"],
+          "method": "GET",
+          "maxConnections": 200,
+          "maxConcurrentStreams": 200,
+          "idleTimeout": 300,
+          "pingTimeout": 100
         }
       },
       "sniffing": {
