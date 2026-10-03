@@ -1,113 +1,33 @@
-# VLESS WebSocket TLS - Google Cloud Run
+# script — VLESS-WS + Status Dashboard (Cloud Run)
 
-Automated VLESS deployment with Xray on Google Cloud Run.
+Cloud Run service running **Xray (VLESS)** with a small Python status dashboard.
 
-## Features
-
-✅ **VLESS Protocol** - Ultra-fast, zero-copy tunneling  
-✅ **WebSocket Transport** - ws:// over TLS  
-✅ **Decoy Routing** - Masquerade with custom headers  
-✅ **Cloud Run Ready** - Auto-scaling, fully managed  
-✅ **Live Dashboard** - Connection monitoring  
-✅ **Health Checks** - Built-in monitoring  
-
-## Quick Start
-
-### Prerequisites
-
-```bash
-gcloud auth login
-gcloud config set project YOUR_PROJECT_ID
+```
+:8080 ──> xray (vless inbounds, /etc/xray/config.json)
+            └─ dashboard: python3 /server.py --host 127.0.0.1 --port 8081
 ```
 
-### Deploy
+## Files
+
+| File | Purpose |
+|---|---|
+| `Dockerfile` | `teddysun/xray` base + python3; copies entrypoint, server, helpers |
+| `config.json` | Xray inbounds (vless + internal http) |
+| `entrypoint.sh` | Sets `$PORT`, starts dashboard (:8081), ip-manager, xray; waits for `$PORT` |
+| `server.py` | Dashboard: `/health`, `/api/stats`, `/api/connections`, `/remote_ips.txt`, `/` |
+| `ip-manager.sh` / `log-user.sh` / `network-monitor.sh` | Connection/IP helpers |
+| `deploy.sh` | Interactive GCP deployer (docker build → push → `gcloud run deploy`) |
+| `.github/workflows/docker-build.yml` | CI: builds & pushes to GHCR on Dockerfile/config changes |
+
+## Deploy
 
 ```bash
 chmod +x deploy.sh
 ./deploy.sh
 ```
 
-## Configuration
+## Dashboard endpoints (localhost :8081 inside the container)
 
-Edit `config.json` to customize:
-
-- **UUID** - Your connection identifier
-- **WS Path** - WebSocket endpoint (default: `/prvtspyyy`)
-- **Host Header** - Decoy domain for masquerading
-
-## Access Points
-
-- **Main Service** - Cloud Run domain (HTTPS port 443)
-- **Dashboard** - `https://SERVICE.run.app/`
-- **Health Check** - `https://SERVICE.run.app/health`
-- **Stats API** - `https://SERVICE.run.app/api/stats`
-
-## VLESS URI Format
-
-```
-vless://UUID@host:443?encryption=none&security=tls&type=ws&path=/prvtspyyy&host=domain&sni=domain&fp=chrome
-```
-
-## Client Configuration
-
-### On v2rayN / v2rayNG
-
-1. Import VLESS URI from deployment output
-2. Set TLS to "tls"
-3. Set WebSocket path to `/prvtspyyy`
-4. Leave encryption as "none"
-
-### On Xray / Clash
-
-```yaml
-proxies:
-  - name: VLESS-WS-TLS
-    type: vless
-    server: cloud-run-domain.run.app
-    port: 443
-    uuid: YOUR_UUID
-    tls: true
-    ws-opts:
-      path: /prvtspyyy
-    alpn:
-      - h2
-      - http/1.1
-```
-
-## Architecture
-
-```
-Client (VLESS)
-    ↓ (TLS + WebSocket)
-Cloud Run Service (Port 8080)
-    ├→ /prvtspyyy → Xray VLESS Protocol → Freedom Outbound
-    ├→ /api/* → Dashboard Server (Port 8081)
-    └→ /health → Health Check Response
-```
-
-## Troubleshooting
-
-**Build Failed**
-- Enable Cloud Build API
-- Check Dockerfile syntax
-
-**Connection Failed**
-- Verify UUID in config.json
-- Check Cloud Run logs: `gcloud run services logs`
-- Test health check: `curl https://SERVICE.run.app/health`
-
-**High Latency**
-- Select region closer to you
-- Increase CPU/Memory allocation
-
-## Security Notes
-
-⚠️ **Important**: 
-- This is for educational purposes only
-- Change default UUID to a secure one
-- Monitor Cloud Run logs regularly
-- Comply with local laws and regulations
-
-## License
-
-MIT - created by prvtspyyy
+- `GET /health` → `healthy`
+- `GET /api/stats`, `GET /api/connections`
+- `GET /remote_ips.txt`
